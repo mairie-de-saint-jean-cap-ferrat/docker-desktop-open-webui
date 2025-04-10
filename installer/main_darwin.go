@@ -1,19 +1,7 @@
 package main
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"context"
-	"errors"
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"path/filepath"
-	"slices"
-
-	"golang.org/x/sys/unix"
 )
 
 const (
@@ -21,7 +9,7 @@ const (
     KERN_PROCARGS = 38
 )
 // checkNvidiaTools retourne toujours "UNSUPPORTED_OS" sur Darwin car le support GPU n'est pas standard.
-func checkNvidiaTools(ctx context.Context) string {
+func checkNvidiaTools_darwin(ctx context.Context) string {
 	return "UNSUPPORTED_OS"
 }
 

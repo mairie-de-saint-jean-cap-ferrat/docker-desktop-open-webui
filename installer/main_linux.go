@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -17,8 +18,8 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// checkNvidiaTools vérifie la présence de nvidia-smi sur Linux.
-func checkNvidiaTools(ctx context.Context) string {
+// Renommer la fonction en checkNvidiaTools_linux
+func checkNvidiaTools_linux(ctx context.Context) string {
 	_, err := exec.LookPath("nvidia-smi")
 	if err == nil {
 		// nvidia-smi trouvé dans le PATH
@@ -29,7 +30,7 @@ func checkNvidiaTools(ctx context.Context) string {
 		return "NVIDIA_TOOLS_NOT_FOUND"
 	}
 	// Autre erreur lors de la recherche
-	fmt.Printf("Error checking for nvidia-smi: %v\n", err) // Log to stderr for debugging
+	fmt.Printf("Error checking for nvidia-smi on Linux: %v\n", err) // Log to stderr for debugging
 	return "ERROR"
 }
 
