@@ -39,7 +39,7 @@ LABEL org.opencontainers.image.title="y0n1x's AI Lab (GPU Check)" \
     org.opencontainers.image.vendor="y0n1x@maytech06.com" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \
-    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui/refs/heads/main/open-webui.svg" \
+    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui/refs/heads/main/yo-ai-lab.png" \
     com.docker.extension.detailed-description="" \
     com.docker.extension.publisher-url="" \
     com.docker.extension.additional-urls="" \
@@ -48,7 +48,7 @@ LABEL org.opencontainers.image.title="y0n1x's AI Lab (GPU Check)" \
 
 COPY docker-compose.yaml .
 COPY metadata.json .
-COPY open-webui.svg .
+COPY yo-ai-lab.png .
 COPY --from=client-builder /ui/build ui
 # Copier seulement le binaire Go modifié
 COPY --from=builder /installer/bin/installer-linux /linux/installer
