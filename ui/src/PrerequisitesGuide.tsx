@@ -47,41 +47,56 @@ const modalStyle = {
   p: 4,
 };
 
-// Contenu des scripts (simples chaînes avec \n et apostrophes échappées)
-const linuxScript = '#!/bin/bash\n' +
-  '# ATTENTION : Vérifiez et adaptez ce script avant exécution !\n' +
-  '# Ce script est un EXEMPLE pour les systèmes basés sur Debian/Ubuntu.\n' +
-  '# L\'\'exécution de commandes avec sudo peut modifier votre système.\n\n' +
-  '# 1. Identifier le pilote recommandé (peut nécessiter l\'\'installation de ubuntu-drivers-common)\n' +
-  '# sudo ubuntu-drivers devices\n\n' +
-  '# 2. Installer le pilote recommandé (remplacer <version> par celle recommandée)\n' +
-  '# sudo apt update\n' +
-  '# sudo apt install nvidia-driver-<version>\n\n' +
-  '# 3. Redémarrer le système\n' +
-  '# sudo reboot\n\n' +
-  'echo "Après le redémarrage, vérifiez l\'\'installation avec \'nvidia-smi\'"\n' +
-  'echo "et redémarrez Docker Desktop."\n';
+// Contenu des scripts mis à jour selon la documentation Ollama
+const linuxScript = `#!/bin/bash
+# ATTENTION : Vérifiez et adaptez ce script avant exécution !
+# Ce script suit les instructions de la documentation Ollama pour Debian/Ubuntu.
+# L'exécution de commandes avec sudo peut modifier votre système.
 
-const windowsScript = '# ATTENTION : L\'\'installation des pilotes NVIDIA sous Windows se fait généralement via un exécutable.\n' +
-  '# Ce script PowerShell est un EXEMPLE pour TÉLÉCHARGER l\'\'installeur.\n' +
-  '# L\'\'exécution de l\'\'installeur téléchargé nécessite des droits administrateur et une confirmation manuelle.\n\n' +
-  '$ProgressPreference = \'SilentlyContinue\' # Pour masquer la barre de progression\n\n' +
-  '# URL Générique (pointe vers la page de téléchargement, pas un fichier direct)\n' +
-  '$downloadPage = "https://www.nvidia.com/Download/index.aspx"\n\n' +
-  '# Chemin où sauvegarder (Adaptez si nécessaire)\n' +
-  '$outputPath = "$HOME\\Downloads\\nvidia_driver_installer.exe" # NOTE: Ce n\'\'est PAS le vrai nom\n\n' +
-  'Write-Host "Ce script NE TÉLÉCHARGERA PAS automatiquement le bon pilote."\n' +
-  'Write-Host "Veuillez visiter le site NVIDIA pour obtenir le bon installeur pour votre matériel :"\n' +
-  'Write-Host $downloadPage\n' +
-  'Write-Host "--- EXEMPLE pour télécharger un fichier (si vous aviez l\'\'URL directe) ---\"\n' +
-  'Write-Host "# Invoke-WebRequest -Uri <URL_DIRECTE_DU_PILOTE> -OutFile $outputPath"\n' +
-  'Write-Host "# Write-Host \"Installeur (exemple) serait téléchargé ici : $outputPath\""\n' +
-  'Write-Host "# Exécutez ensuite l\'\'installeur téléchargé manuellement."\n\n' +
-  '# Ouvre la page de téléchargement dans le navigateur par défaut\n' +
-  'Start-Process $downloadPage\n\n' +
-  'Write-Host "Après installation manuelle et redémarrage, vérifiez avec \'nvidia-smi\'"\n' +
-  'Write-Host "(Peut se trouver dans C:\\Program Files\\NVIDIA Corporation\\NVSMI\\)"\n' +
-  'Write-Host "et redémarrez Docker Desktop."\n';
+# 1. Configurer le dépôt NVIDIA Container Toolkit
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+| sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+&& curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+| sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+| sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list \
+&& sudo apt-get update
+
+# 2. Installer les paquets NVIDIA Container Toolkit
+sudo apt-get install -y nvidia-container-toolkit
+
+# 3. Configurer Docker pour utiliser le runtime NVIDIA
+#    Attention : Cette étape modifie la configuration Docker globale.
+sudo nvidia-ctk runtime configure --runtime=docker
+
+# 4. Redémarrer le service Docker
+sudo systemctl restart docker
+
+echo "Le NVIDIA Container Toolkit devrait être installé et configuré."
+echo "Vérifiez la configuration Docker et redémarrez Docker Desktop si nécessaire."
+echo "Après cela, l'accélération GPU devrait être disponible pour les conteneurs Ollama."
+`;
+
+// Pour Windows, le processus principal reste le téléchargement manuel des pilotes.
+// Le NVIDIA Container Toolkit n'est pas directement applicable de la même manière que sur Linux.
+// On guide l'utilisateur vers l'installation des pilotes et la configuration Docker Desktop.
+const windowsGuide = `
+L'accélération GPU NVIDIA sous Windows via Docker Desktop repose principalement sur :
+1.  **Installation des pilotes NVIDIA:**
+    - Téléchargez et installez les derniers pilotes NVIDIA pour votre carte graphique depuis le site officiel.
+    - Lien : https://www.nvidia.com/Download/index.aspx
+    - Redémarrez votre machine après l'installation des pilotes.
+
+2.  **Activation du support GPU dans Docker Desktop:**
+    - Allez dans Paramètres > Resources > Advanced.
+    - Assurez-vous que l'option "Enable GPU acceleration" (ou similaire) est cochée, si disponible pour votre version de Docker Desktop et WSL.
+
+3.  **Redémarrage de Docker Desktop:**
+    - Redémarrez Docker Desktop après avoir installé les pilotes et vérifié les paramètres.
+
+L'outil 'nvidia-smi.exe' (généralement dans C:\Program Files\NVIDIA Corporation\NVSMI\) permet de vérifier que les pilotes sont bien installés et détectent votre GPU.
+
+Cette extension tentera d'utiliser l'accélération GPU si elle est correctement configurée sur votre système et dans Docker Desktop.
+`;
 
 export const PrerequisitesGuide: React.FC<PrerequisitesGuideProps> = ({ status, platform, showSuccessToast, showErrorToast }) => {
   const [openModal, setOpenModal] = useState<'linux' | 'windows' | null>(null);
@@ -105,47 +120,55 @@ export const PrerequisitesGuide: React.FC<PrerequisitesGuideProps> = ({ status, 
     window.location.reload();
   };
 
-  let title = 'Prérequis pour l\'accélération GPU';
+  let title = 'Prérequis pour l\'accélération GPU (Optionnel)';
   let content;
-  let showScriptButtons = false;
+  let showGuidanceButtons = false;
 
   switch (status) {
     case 'NVIDIA_TOOLS_NOT_FOUND':
-      title = 'Pilotes NVIDIA manquants';
-      showScriptButtons = platform === 'linux' || platform === 'win32';
+      title = 'Accélération GPU NVIDIA non détectée';
+      showGuidanceButtons = platform === 'linux' || platform === 'win32';
       content = (
         <>
+           <Alert severity="info" sx={{ mb: 2 }}>
+               <AlertTitle>Information</AlertTitle>
+               L'accélération GPU avec les cartes NVIDIA est **optionnelle** mais recommandée pour de meilleures performances. L'extension fonctionnera en mode CPU si les prérequis GPU ne sont pas satisfaits.
+            </Alert>
           <Typography paragraph>
-            L\'extension n\'a pas détecté les outils NVIDIA (`nvidia-smi`) nécessaires pour utiliser l\'accélération GPU.
+            L'extension n'a pas détecté les outils NVIDIA (`nvidia-smi` ou configuration Docker adéquate) pour utiliser l'accélération GPU.
           </Typography>
           <Typography paragraph>
-            Veuillez suivre ces étapes :
+            Pour activer l'accélération GPU (si vous avez une carte NVIDIA compatible) :
           </Typography>
           <List dense>
-            <ListItem>
-              <ListItemIcon>
-                <InfoIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Téléchargez et installez les derniers pilotes NVIDIA pour votre carte graphique :"
-                secondary={<Link href="https://www.nvidia.com/Download/index.aspx" target="_blank" rel="noopener noreferrer">Site de téléchargement NVIDIA</Link>}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <InfoIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Assurez-vous que le support GPU est activé dans Docker Desktop :"
-                secondary="Paramètres > Resources > Advanced > Enable GPU acceleration (si disponible)"
-              />
-            </ListItem>
+             {platform === 'linux' && (
+                 <ListItem>
+                    <ListItemIcon>
+                        <InfoIcon color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                        primary="Installez le NVIDIA Container Toolkit :"
+                        secondary="Suivez les instructions fournies dans le guide Linux ci-dessous."
+                     />
+                 </ListItem>
+             )}
+            {platform === 'win32' && (
+                <ListItem>
+                    <ListItemIcon>
+                        <InfoIcon color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                        primary="Installez les pilotes NVIDIA et configurez Docker Desktop :"
+                        secondary="Suivez les instructions fournies dans le guide Windows ci-dessous."
+                    />
+                </ListItem>
+            )}
              <ListItem>
               <ListItemIcon>
                 <InfoIcon color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary="Redémarrez Docker Desktop après l'installation des pilotes."
+                primary="Redémarrez Docker Desktop après avoir effectué les configurations nécessaires."
               />
             </ListItem>
           </List>
@@ -153,32 +176,47 @@ export const PrerequisitesGuide: React.FC<PrerequisitesGuideProps> = ({ status, 
       );
       break;
     case 'UNSUPPORTED_OS':
-      title = 'Système d\'exploitation non supporté';
+      title = 'Accélération GPU non supportée sur cet OS';
       content = (
-        <Typography paragraph>
-          L\'accélération GPU via Docker Desktop n\'est actuellement pas prise en charge de manière standard sur macOS avec les GPU NVIDIA.
-          L\'extension fonctionnera sans accélération matérielle spécifique.
-        </Typography>
+        <>
+         <Alert severity="info" sx={{ mb: 2 }}>
+           <AlertTitle>Information</AlertTitle>
+            L'extension fonctionnera en utilisant le CPU.
+         </Alert>
+          <Typography paragraph>
+            L'accélération GPU NVIDIA via Docker Desktop n'est actuellement pas prise en charge de manière standard sur macOS.
+          </Typography>
+        </>
       );
       break;
     case 'ERROR':
-       title = 'Erreur lors de la vérification';
-      content = (
-        <Typography paragraph color="error">
-          Une erreur s\'est produite lors de la vérification des prérequis GPU. Veuillez consulter les logs de l\'extension pour plus de détails.
-        </Typography>
-      );
-      break;
+       title = 'Erreur lors de la vérification GPU';
+       content = (
+         <>
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            <AlertTitle>Attention</AlertTitle>
+            Une erreur s'est produite lors de la vérification des prérequis GPU. L'extension tentera de fonctionner en mode CPU.
+            Consultez les logs pour plus de détails.
+          </Alert>
+           <Typography paragraph color="error">
+             Détails de l'erreur lors de la vérification : {status}
+           </Typography>
+        </>
+       );
+       break;
     default:
-      title = 'Statut inconnu';
-      content = (
-        <Typography paragraph>
-          Impossible de déterminer le statut des prérequis GPU ({status}).
-        </Typography>
-      );
+      title = 'Vérification des prérequis GPU';
+       content = (
+         <Typography paragraph>
+           Statut de la vérification GPU : {status || 'Non déterminé'}. L'extension va démarrer. Si l'accélération GPU est attendue mais non détectée ('OK' non retourné), vérifiez les guides.
+         </Typography>
+       );
+       showGuidanceButtons = false;
+       break;
   }
 
-  const scriptContent = openModal === 'linux' ? linuxScript : windowsScript;
+  const scriptContent = openModal === 'linux' ? linuxScript : windowsGuide;
+  const isWindowsModal = openModal === 'windows';
 
   return (
     <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -188,20 +226,20 @@ export const PrerequisitesGuide: React.FC<PrerequisitesGuideProps> = ({ status, 
         </Typography>
         {content}
 
-        {showScriptButtons && (
+        {showGuidanceButtons && (
           <Box sx={{ mt: 3, textAlign: 'center' }}>
              <Typography variant="body2" gutterBottom>
-               Exemples de scripts pour l'installation (à vérifier et adapter) :
+               Guides pour activer l'accélération GPU NVIDIA (Optionnel) :
             </Typography>
             <Stack direction="row" spacing={2} justifyContent="center">
               {platform === 'linux' && (
                 <Button variant="outlined" onClick={() => handleOpenModal('linux')}>
-                  Voir script Linux (Exemple)
+                  Voir Guide Linux (NVIDIA Toolkit)
                 </Button>
               )}
               {platform === 'win32' && (
                 <Button variant="outlined" onClick={() => handleOpenModal('windows')}>
-                  Voir aide Windows
+                  Voir Guide Windows (Pilotes & Docker)
                 </Button>
               )}
             </Stack>
@@ -225,7 +263,7 @@ export const PrerequisitesGuide: React.FC<PrerequisitesGuideProps> = ({ status, 
 
       <Dialog open={openModal !== null} onClose={handleCloseModal} maxWidth="md" fullWidth>
         <DialogTitle sx={{ m: 0, p: 2 }}>
-          Exemple de script pour {openModal === 'linux' ? 'Linux (Debian/Ubuntu)' : 'Windows (PowerShell)'}
+          {isWindowsModal ? 'Guide pour Windows (Pilotes NVIDIA & Docker Desktop)' : 'Guide d\'installation pour Linux (NVIDIA Container Toolkit)'}
           <IconButton
             aria-label="close"
             onClick={handleCloseModal}
@@ -240,26 +278,29 @@ export const PrerequisitesGuide: React.FC<PrerequisitesGuideProps> = ({ status, 
           </IconButton>
         </DialogTitle>
         <DialogContent dividers>
-            <Alert severity="warning" sx={{ mb: 2 }}>
-                <AlertTitle>Attention !</AlertTitle>
-                L'exécution de scripts, surtout avec des privilèges élevés (sudo/admin), peut modifier en profondeur votre système. 
-                <strong>Vérifiez, comprenez et adaptez ce script à votre configuration spécifique avant toute exécution.</strong> 
-                Ce script est fourni à titre indicatif et sans garantie.
+            <Alert severity={isWindowsModal ? "info" : "warning"} sx={{ mb: 2 }}>
+                <AlertTitle>{isWindowsModal ? "Instructions" : "Attention !"}</AlertTitle>
+                 {isWindowsModal
+                    ? "Suivez ces étapes pour configurer l'accélération GPU sous Windows."
+                    : "L'exécution de scripts, surtout avec sudo, peut modifier votre système. Vérifiez, comprenez et adaptez ce script si nécessaire."
+                }
             </Alert>
           <Box sx={{ position: 'relative', bgcolor: 'grey.100', p: 1, borderRadius: 1, maxHeight: '400px', overflowY: 'auto' }}>
-            <IconButton
-              size="small"
-              onClick={() => handleCopyToClipboard(scriptContent)}
-              sx={{ position: 'absolute', top: 8, right: 8 }}
-              title="Copier le script"
-            >
-              <ContentCopyIcon fontSize="inherit" />
-            </IconButton>
+            {!isWindowsModal && (
+                 <IconButton
+                     size="small"
+                     onClick={() => handleCopyToClipboard(scriptContent)}
+                     sx={{ position: 'absolute', top: 8, right: 8 }}
+                     title="Copier le script"
+                 >
+                     <ContentCopyIcon fontSize="inherit" />
+                 </IconButton>
+             )}
             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                 <code>{scriptContent}</code>
             </pre>
           </Box>
-           {copied && <Typography sx={{ color: 'success.main', textAlign: 'right', mt: 1 }}>Copié !</Typography>}
+           {!isWindowsModal && copied && <Typography sx={{ color: 'success.main', textAlign: 'right', mt: 1 }}>Copié !</Typography>}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal}>Fermer</Button>

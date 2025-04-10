@@ -34,8 +34,8 @@ RUN npm run build
 
 FROM alpine
 # Mettre à jour les labels si nécessaire, supprimer les références obsolètes
-LABEL org.opencontainers.image.title="y0n1x's AI Lab (GPU Check)" \
-    org.opencontainers.image.description="y0n1x's AI Lab for Docker Desktop with GPU prerequisite check" \
+LABEL org.opencontainers.image.title="y0n1x's AI Lab" \
+    org.opencontainers.image.description="y0n1x's AI Lab for Docker Desktop" \
     org.opencontainers.image.vendor="y0n1x@maytech06.com" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \

@@ -1,10 +1,12 @@
 services:
   searxng:
-    image: searxng/searxng:latest
+    build:
+      context: ./searxng
+    # image: searxng/searxng:latest
     ports:
       - "11505:8080"
-    volumes:
-      - ./linux/searxng:/etc/searxng
+    # volumes:
+    #   - ./linux/searxng:/etc/searxng
     restart: always
   
   
@@ -16,7 +18,7 @@ services:
     ports:
       - "11500:8080"
     volumes:
-      - ./linux/open-webui:/app/backend/data
+      - open-webui:/app/backend/data
     environment:
       - WEBUI_AUTH=False
       - WEBUI_SESSION_COOKIE_SAME_SITE=None
@@ -214,7 +216,7 @@ services:
     ports:
       - "11552:8888"
     volumes:
-      - ./linux/jupyter:/home/jovyan/work
+      - jupyter:/home/jovyan/work
     environment:
       - JUPYTER_ENABLE_LAB=yes
       - JUPYTER_TOKEN=123456
@@ -233,9 +235,11 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ./linux/ollama:/root/.ollama
+      - ollama:/root/.ollama
     restart: always
 
-# volumes:
-#   open-webui:
+volumes:
+  open-webui:
+  ollama:
+  jupyter:
 
