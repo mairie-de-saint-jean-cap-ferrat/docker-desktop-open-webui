@@ -26,50 +26,62 @@ export function App() {
     toast.error(message);
   }, []);
 
-  useEffect(() => {
-    const checkPrerequisites = async () => {
-      setError(null);
-      setGpuStatus(null);
-      let currentPlatform = '';
-      try {
-        if (!ddClient.extension?.host) {
-          throw new Error("Docker Desktop extension host API not available.");
-        }
+  // useEffect(() => {
+  //   const checkPrerequisites = async () => {
+  //     console.log('Starting prerequisite check...');
+  //     setError(null);
+  //     setGpuStatus(null);
+  //     setChecked(false);
+  //     let currentPlatform = '';
+  //     try {
+  //       if (!ddClient.extension?.host?.cli) {
+  //         throw new Error("Docker Desktop extension host CLI API not available.");
+  //       }
+// 
+  //       console.log('Getting host platform...');
+  //       currentPlatform = ddClient.host.platform;
+  //       console.log(`Host platform: ${currentPlatform}`);
+  //       setPlatform(currentPlatform);
+// 
+  //       const isWindows = currentPlatform === 'win32';
+  //       const command = isWindows ? 'installer.exe' : 'installer';
+  //       
+  //       console.log(`Executing check command: ${command}`);
+  //       const result = await ddClient.extension.host.cli.exec(command, []);
+  //       console.log('Check command finished.', 'Result:', result);
+  //       
+  //       const status = result.stdout.trim();
+  //       console.log(`Initial GPU Status from stdout: "${status}"`);
+  //       setGpuStatus(status);
+// 
+  //       if (result.stderr) {
+  //         console.warn(`Prerequisite check command stderr: ${result.stderr}`);
+  //       }
+  //       console.log('Prerequisite check successful.');
+  //     } catch (err: any) {
+  //       console.error('Error during prerequisite check:', err);
+  //       const errorMessage = `Failed prerequisite check (${err?.code || 'unknown error'}): ${err?.stderr || err?.stdout || err?.message || JSON.stringify(err)}`;
+  //       console.log(`Setting error state: "${errorMessage}"`);
+  //       setError(errorMessage);
+  //       console.log('Setting GPU status to ERROR');
+  //       setGpuStatus('ERROR');
+  //     } finally {
+  //       console.log('Prerequisite check finished (finally block). Setting checked to true.');
+  //       setChecked(true);
+  //     }
+  //   };
+// 
+  //   checkPrerequisites();
+  // }, []);
 
-        currentPlatform = ddClient.host.platform;
-        setPlatform(currentPlatform);
-
-        const isWindows = currentPlatform === 'win32';
-        const command = isWindows ? 'installer.exe' : 'installer';
-        
-        console.log(`Executing initial check: ${command}`);
-        const result = await ddClient.extension.host.cli.exec(command, []);
-        console.log('Initial check result:', result);
-        
-        const status = result.stdout.trim();
-        console.log(`Initial GPU Status: ${status}`);
-        setGpuStatus(status);
-
-        if (result.stderr) {
-          console.warn(`Prerequisite check stderr: ${result.stderr}`);
-        }
-      } catch (err: any) {
-        console.error('Error checking prerequisites on load:', err);
-        const errorMessage = `Failed initial prerequisite check (${err.code || 'unknown'}): ${err.stderr || err.stdout || err.message || JSON.stringify(err)}`;
-        setError(errorMessage);
-        setGpuStatus('ERROR');
-      } finally {
-        setChecked(true);
-      }
-    };
-
-    checkPrerequisites();
-  }, []);
+  console.log(`Rendering App - checked: ${checked}, error: ${error}, gpuStatus: ${gpuStatus}`);
 
   let content;
   if (!checked) {
+    console.log('Rendering LoadingView because checked is false.');
     content = <LoadingView />;
   } else if (error) {
+    console.log('Rendering Error view.');
     content = (
        <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">Erreur lors de la vérification initiale</Typography>
@@ -81,15 +93,9 @@ export function App() {
         </Typography>
       </Box>
     );
-  } else if (gpuStatus === 'OK') {
-    content = <WebpageFrame />;
   } else {
-    content = <InstallView 
-                status={gpuStatus} 
-                platform={platform} 
-                showSuccessToast={showSuccessToast} 
-                showErrorToast={showErrorToast} 
-              />;
+    console.log('Rendering WebpageFrame because check is complete and no fatal error occurred.');
+    content = <WebpageFrame />;
   }
 
   return (
@@ -106,6 +112,8 @@ export function App() {
         pauseOnHover
         theme="colored" 
       />
+      {/* ToastNotification pourrait être intégré ici si nécessaire, mais il semble indépendant */}
+      {/* <ToastNotification /> */}
       {content}
     </>
   );

@@ -1,5 +1,7 @@
 services:
   searxng:
+    container_name: searxng
+    hostname: searxng
     # build:
     #   dockerfile: Dockerfile.searxng
     image: ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui:searxng
@@ -13,6 +15,8 @@ services:
   
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    hostname: open-webui
     depends_on:
       - ollama
     ports:
@@ -33,7 +37,7 @@ services:
       # - ENABLE_PERSISTENT_CONFIG=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
-      # - WEBUI_URL=http://localhost:11500
+      - WEBUI_URL=http://0.0.0.0:11500
       # - ENABLE_SIGNUP=True
       # - ENABLE_LOGIN_FORM=True
       # - ENABLE_REALTIME_CHAT_SAVE=False
@@ -199,6 +203,8 @@ services:
 
   docling-serve:
     image: quay.io/docling-project/docling-serve
+    container_name: docling-serve
+    hostname: docling-serve
     ports:
       - "11551:5001"
     environment:
@@ -207,12 +213,16 @@ services:
 
   openai-edge-tts:
     image: travisvn/openai-edge-tts:latest
+    container_name: openai-edge-tts
+    hostname: openai-edge-tts
     ports:
       - "11550:5050"
     restart: always
 
   jupyter:
     image: jupyter/minimal-notebook:latest
+    container_name: jupyter
+    hostname: jupyter
     ports:
       - "11552:8888"
     volumes:
@@ -225,6 +235,7 @@ services:
   ollama:
     image: ollama/ollama
     container_name: ollama
+    hostname: ollama
     deploy:
       resources:
         reservations:
