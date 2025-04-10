@@ -19,7 +19,7 @@ services:
     ports:
       - "11500:8080"
     volumes:
-      - open-webui:/app/backend/data
+      - ./linux/open-webui:/app/backend/data
     environment:
       - WEBUI_AUTH=False
       - WEBUI_SESSION_COOKIE_SAME_SITE=None
@@ -216,14 +216,13 @@ services:
     image: jupyter/minimal-notebook:latest
     container_name: jupyter-notebook
     ports:
-      - "8888:8888"
+      - "11504:8888"
     volumes:
-      - jupyter_data:/home/jovyan/work
+      - ./linux/jupyter:/home/jovyan/work
     environment:
       - JUPYTER_ENABLE_LAB=yes
       - JUPYTER_TOKEN=123456
     restart: always
 
-volumes:
-  open-webui:
-  jupyter_data:
+# volumes:
+#   open-webui:
