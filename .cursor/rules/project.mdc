@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Règles pour l'assistance IA dans le projet docker-desktop-rdx-open-webui
+# Règles pour l'assistance IA dans le projet docker-desktop-open-webui
 
 # --- Principes Généraux ---
 1.  **Vérifier l'Information** : Toujours vérifier les informations (API Docker, commandes, etc.) avant de les présenter. Ne pas faire de suppositions.

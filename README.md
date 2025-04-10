@@ -1,6 +1,6 @@
 # Open WebUI Docker Extension (avec vérification GPU)
 
-[![Build](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui/actions/workflows/build.yaml/badge.svg?branch=main&event=release)](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui/actions/workflows/build.yaml)
+[![Build](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui/actions/workflows/build.yaml/badge.svg?branch=main&event=release)](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui/actions/workflows/build.yaml)
 
 Extension Docker Desktop qui déploie [Open WebUI](https://docs.openwebui.com/) (configuré pour utiliser Ollama intégré et l'accélération GPU si disponible) et vérifie les prérequis pour l'accélération GPU NVIDIA.
 
@@ -32,8 +32,8 @@ L'extension va :
 - Exécutez la commande :
 
   ```sh
-  docker extension install ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui:<tag>
-  # Exemple: docker extension install ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui:latest
+  docker extension install ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui:<tag>
+  # Exemple: docker extension install ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui:latest
   ```
 
 ## Comment désinstaller
@@ -41,7 +41,7 @@ L'extension va :
 - Exécutez la commande :
 
   ```sh
-  docker extension uninstall ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui:<tag>
+  docker extension uninstall ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui:<tag>
   ```
 
 ## Comment construire l'image de l'extension
