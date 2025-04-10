@@ -33,16 +33,16 @@ COPY ui /ui
 RUN npm run build
 
 FROM alpine
-LABEL org.opencontainers.image.title="Open WebUI" \
-    org.opencontainers.image.description="Open WebUI on Rancher Desktop" \
-    org.opencontainers.image.vendor="SUSE LLC" \
+LABEL org.opencontainers.image.title="y0n1x's AI Lab" \
+    org.opencontainers.image.description="y0n1x's AI Lab on Docker Desktop" \
+    org.opencontainers.image.vendor="y0n1x@maytech06.com" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \
-    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/rancher-sandbox/rancher-desktop-rdx-open-webui/refs/tags/v0.0.6/open-webui.svg" \
+    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui/open-webui.svg" \
     com.docker.extension.detailed-description="" \
     com.docker.extension.publisher-url="" \
     com.docker.extension.additional-urls="" \
-    com.docker.extension.categories="" \
+    com.docker.extension.categories="AI" \
     com.docker.extension.changelog=""
 
 COPY docker-compose.yaml .
