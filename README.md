@@ -51,4 +51,4 @@ L'extension va :
   # Exemple: docker build -t y0n1x/rd-open-webui-ext:latest .
   ```
 
-**(Les commandes `rdctl` peuvent aussi être utilisées si vous utilisez Rancher Desktop)**
+*(Les commandes `rdctl` peuvent aussi être utilisées si vous utilisez Rancher Desktop)*
