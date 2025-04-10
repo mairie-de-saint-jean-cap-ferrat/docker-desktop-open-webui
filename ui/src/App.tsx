@@ -32,6 +32,10 @@ export function App() {
       setGpuStatus(null);
       let currentPlatform = '';
       try {
+        if (!ddClient.extension?.host) {
+          throw new Error("Docker Desktop extension host API not available.");
+        }
+
         currentPlatform = ddClient.host.platform;
         setPlatform(currentPlatform);
 
