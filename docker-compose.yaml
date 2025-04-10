@@ -7,15 +7,12 @@ services:
       - ./linux/searxng:/etc/searxng
     restart: always
   
+  
+  
   open-webui:
-    image: ghcr.io/open-webui/open-webui:ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    image: ghcr.io/open-webui/open-webui:main
+    depends_on:
+      - ollama
     ports:
       - "11500:8080"
     volumes:
@@ -29,6 +26,7 @@ services:
       - RAG_WEB_SEARCH_ENGINE=searxng
       - DEFAULT_MODELS=tinyllama
       - SEARXNG_QUERY_URL=http://host.docker.internal:11505
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
       # - ENV=dev
       # - ENABLE_PERSISTENT_CONFIG=True
       - CUSTOM_NAME="y0n1x's AI Lab"
@@ -56,7 +54,6 @@ services:
       # - ENABLE_FILE_LOGGING=False
       # - LOG_MAX_BYTES=10485760
       # - LOG_BACKUP_COUNT=5
-      # - OLLAMA_BASE_URL=""
       # - OLLAMA_BASE_URLS=""
       # - OLLAMA_API_KEY=""
       # - OLLAMA_KEEP_ALIVE=""
@@ -224,5 +221,22 @@ services:
       - JUPYTER_TOKEN=123456
     restart: always
 
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./linux/ollama:/root/.ollama
+    restart: always
+
 # volumes:
 #   open-webui:
+
