@@ -6,6 +6,7 @@ services:
     volumes:
       - ./linux/searxng:/etc/searxng
     restart: always
+  
   open-webui:
     image: ghcr.io/open-webui/open-webui:ollama
     deploy:
@@ -29,7 +30,7 @@ services:
       - DEFAULT_MODELS=tinyllama
       - SEARXNG_QUERY_URL=http://host.docker.internal:11505
       # - ENV=dev
-      - ENABLE_PERSISTENT_CONFIG=True
+      # - ENABLE_PERSISTENT_CONFIG=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
       # - WEBUI_URL=http://localhost:11500
