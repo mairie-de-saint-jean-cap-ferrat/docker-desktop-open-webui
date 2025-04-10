@@ -1,5 +1,7 @@
 # Open WebUI Docker Extension (avec vérification GPU)
 
+[![Build](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui/actions/workflows/build.yaml/badge.svg?branch=main&event=release)](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-rdx-open-webui/actions/workflows/build.yaml)
+
 Extension Docker Desktop qui déploie [Open WebUI](https://docs.openwebui.com/) (configuré pour utiliser Ollama intégré et l'accélération GPU si disponible) et vérifie les prérequis pour l'accélération GPU NVIDIA.
 
 ## Prérequis (Accélération GPU NVIDIA)
