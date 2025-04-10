@@ -1,6 +1,6 @@
 FROM golang:1.24-alpine AS builder
 ENV CGO_ENABLED=0
-# Pas besoin de curl ou unzip pour juste compiler le vérificateur GPU
+
 RUN apk update && \
     apk add --no-cache curl unzip
 

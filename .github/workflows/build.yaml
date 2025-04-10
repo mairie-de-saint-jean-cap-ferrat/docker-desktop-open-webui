@@ -23,6 +23,24 @@ jobs:
             echo "$prefix:${{ github.sha }}" >> "$GITHUB_OUTPUT";;
         esac
         echo "##" >> "$GITHUB_OUTPUT"
+    - id: searxng_tags
+      name: Calculate searxng tags
+      shell: bash
+      run: |
+        prefix=ghcr.io/${{ github.repository }}
+        echo "TAGS<<##" >> "$GITHUB_OUTPUT"
+        ref=${{ github.ref }}
+        # Always push :searxng tag
+        echo "$prefix:searxng" >> "$GITHUB_OUTPUT"
+        case "$ref" in
+          refs/heads/main)
+            echo "$prefix:latest-searxng" >> "$GITHUB_OUTPUT";;
+          refs/tags/v[0-9]*)
+            echo "$prefix:${ref#refs/tags/}-searxng" >> "$GITHUB_OUTPUT";;
+          *)
+            echo "$prefix:${{ github.sha }}-searxng" >> "$GITHUB_OUTPUT";;
+        esac
+        echo "##" >> "$GITHUB_OUTPUT"
     - uses: docker/setup-qemu-action@v3
       with:
         platforms: amd64,arm64
@@ -41,5 +59,15 @@ jobs:
         platforms: |
           linux/amd64
           linux/arm64
-        push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
+        push: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') }}
         tags: ${{ steps.tags.outputs.TAGS }}
+    - uses: docker/build-push-action@v6
+      name: Build and push searxng image
+      with:
+        context: .
+        file: ./Dockerfile.searxng
+        platforms: |
+          linux/amd64
+          linux/arm64
+        push: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') }}
+        tags: ${{ steps.searxng_tags.outputs.TAGS }}

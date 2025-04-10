@@ -1,8 +1,8 @@
 services:
   searxng:
-    build:
-      dockerfile: Dockerfile.searxng
-    # image: searxng/searxng:latest
+    # build:
+    #   dockerfile: Dockerfile.searxng
+    image: ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui:searxng
     ports:
       - "11505:8080"
     # volumes:
