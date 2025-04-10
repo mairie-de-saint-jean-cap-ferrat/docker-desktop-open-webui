@@ -1,7 +1,7 @@
 services:
   searxng:
     build:
-      context: ./searxng
+      dockerfile: Dockerfile.searxng
     # image: searxng/searxng:latest
     ports:
       - "11505:8080"

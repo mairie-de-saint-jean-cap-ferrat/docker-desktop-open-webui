@@ -47,6 +47,7 @@ LABEL org.opencontainers.image.title="y0n1x's AI Lab" \
     com.docker.extension.changelog=""
 
 COPY docker-compose.yaml .
+COPY Dockerfile.searxng .
 COPY metadata.json .
 COPY yo-ai-lab.png .
 COPY --from=client-builder /ui/build ui
