@@ -8,6 +8,13 @@ services:
     restart: always
   open-webui:
     image: ghcr.io/open-webui/open-webui:ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     ports:
       - "11500:8080"
     volumes:
