@@ -25,7 +25,7 @@ L'extension va :
 
 ## Comment installer
 
-- Installez et lancez [Docker Desktop](https://www.docker.com/products/docker-desktop/) (ou Rancher Desktop, si compatible).
+- Installez et lancez [Docker Desktop](https://www.docker.com/products/docker-desktop/) (ou Docker Desktop, si compatible).
 - Assurez-vous que les prérequis GPU (voir ci-dessus) sont satisfaits si vous souhaitez l'accélération matérielle.
 - Exécutez la commande :
 
@@ -51,4 +51,4 @@ L'extension va :
   # Exemple: docker build -t y0n1x/rd-open-webui-ext:latest .
   ```
 
-*(Les commandes `rdctl` peuvent aussi être utilisées si vous utilisez Rancher Desktop)*
+*(Les commandes `rdctl` peuvent aussi être utilisées si vous utilisez Docker Desktop)*

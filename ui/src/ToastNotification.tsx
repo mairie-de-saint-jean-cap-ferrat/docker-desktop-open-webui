@@ -48,7 +48,7 @@ const ToastNotification = () => {
         const toastId = toast(
             <div>
                 <p>
-                    Enjoying the Rancher Desktop Open WebUI extension? Ready to deploy
+                    Enjoying the Docker Desktop Open WebUI extension? Ready to deploy
                     Ollama and Open WebUI stack to production? Try out{' '}
                     <a
                         href="#"

@@ -1,4 +1,4 @@
-IMAGE?=rancher-sandbox/rd-open-webui-ext
+IMAGE?=docker-sandbox/rd-open-webui-ext
 TAG?=latest
 
 BUILDER=buildx-multi-arch

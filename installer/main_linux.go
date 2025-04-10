@@ -1,25 +1,14 @@
 package main
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"os"
 	"os/exec"
-	"path/filepath"
-	"runtime"
-	"strconv"
-
-	"golang.org/x/sys/unix"
 )
 
-// Renommer la fonction en checkNvidiaTools_linux
-func checkNvidiaTools_linux(ctx context.Context) string {
+// Renommer la fonction en checkNvidiaTools (sans suffixe)
+func checkNvidiaTools(ctx context.Context) string {
 	_, err := exec.LookPath("nvidia-smi")
 	if err == nil {
 		// nvidia-smi trouvé dans le PATH

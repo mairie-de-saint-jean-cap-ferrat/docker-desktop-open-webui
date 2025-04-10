@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 )
 
-// Renommer la fonction en checkNvidiaTools_windows
-func checkNvidiaTools_windows(ctx context.Context) string {
+// Renommer la fonction en checkNvidiaTools (sans suffixe)
+func checkNvidiaTools(ctx context.Context) string {
 	// 1. Vérifier dans le PATH
 	_, errPath := exec.LookPath("nvidia-smi.exe")
 	if errPath == nil {

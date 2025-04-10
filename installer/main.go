@@ -18,17 +18,12 @@ func main() {
 }
 
 func checkGPUSupportAndPrintStatus(ctx context.Context) {
-	status := "UNKNOWN_OS"
-	switch runtime.GOOS {
-	case "linux":
-		status = checkNvidiaTools_linux(ctx)
-	case "windows":
-		status = checkNvidiaTools_windows(ctx)
-	case "darwin":
-		status = checkNvidiaTools_darwin(ctx)
-	default:
-		status = "UNSUPPORTED_OS"
-		log.Printf("Unsupported operating system: %s", runtime.GOOS)
+	status := checkNvidiaTools(ctx)
+
+	if status == "UNKNOWN_OS" || status == "UNSUPPORTED_OS"{
+		log.Printf("GPU check not applicable or OS (%s) unsupported.", runtime.GOOS)
+	} else if status != "OK" && status != "NVIDIA_TOOLS_NOT_FOUND" && status != "ERROR" {
+		log.Printf("Unexpected GPU check status: %s", status)
 	}
 
 	fmt.Println(status)

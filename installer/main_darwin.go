@@ -9,7 +9,7 @@ const (
     KERN_PROCARGS = 38
 )
 // checkNvidiaTools retourne toujours "UNSUPPORTED_OS" sur Darwin car le support GPU n'est pas standard.
-func checkNvidiaTools_darwin(ctx context.Context) string {
+func checkNvidiaTools(ctx context.Context) string {
 	return "UNSUPPORTED_OS"
 }
 
