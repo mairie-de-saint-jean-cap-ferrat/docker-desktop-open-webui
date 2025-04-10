@@ -1,0 +1,34 @@
+# Règles pour l'assistance IA dans le projet docker-desktop-rdx-open-webui
+
+# --- Principes Généraux ---
+1.  **Vérifier l'Information** : Toujours vérifier les informations (API Docker, commandes, etc.) avant de les présenter. Ne pas faire de suppositions.
+2.  **Changements Fichier par Fichier** : Appliquer les modifications fichier par fichier pour faciliter la revue.
+3.  **Pas d'Excuses** : Ne pas utiliser d'excuses.
+4.  **Pas de Feedback sur la Compréhension** : Éviter les commentaires indiquant une (in)compréhension.
+5.  **Pas de Suggestions Superflues** : Ne pas suggérer de changements cosmétiques (espaces) ou non demandés.
+6.  **Pas de Résumés** : Ne pas résumer les changements effectués.
+7.  **Pas d'Inventions** : Se limiter aux changements explicitement demandés.
+8.  **Pas de Confirmations Inutiles** : Ne pas redemander des informations déjà présentes dans le contexte.
+9.  **Préserver le Code Existant** : Ne pas supprimer de code ou de fonctionnalités non liés à la demande. Faire attention à la réutilisation des composants UI existants (ex: `ToastNotification`).
+10. **Éditions Atomiques par Fichier** : Fournir toutes les modifications pour un fichier donné en un seul bloc.
+11. **Pas de Demande de Vérification Évidente** : Ne pas demander de vérifier des implémentations visibles dans le contexte.
+12. **Pas de Mises à Jour Inutiles** : Ne pas suggérer de modifications si aucun changement réel n'est nécessaire.
+13. **Liens Réels** : Fournir des liens vers les fichiers réels du projet si nécessaire.
+14. **Ne Pas Afficher l'Existant** : Ne pas montrer/discuter l'implémentation actuelle sauf si demandé.
+15. **Vérifier le Contexte Fichier** : Toujours consulter le contenu du fichier actuel fourni dans le contexte.
+
+# --- Spécificités Techniques (Docker Extension & Ce Projet) ---
+16. **Contexte Docker Extension** : Comprendre l'architecture typique (UI React, services Docker Compose, interaction via `@docker/extension-api-client`).
+17. **Sécurité Interaction Hôte** : Privilégier la **vérification** des prérequis hôte (ex: pilotes GPU via binaire Go) et **guider** l'utilisateur via l'UI. **NE PAS** tenter d'installer/modifier directement le système hôte depuis l'extension.
+18. **React/TypeScript/MUI** : Adhérer aux bonnes pratiques pour React (Hooks : `useState`, `useEffect`, `useCallback`), TypeScript (typage fort) et Material UI (utilisation des composants : `Box`, `Typography`, `Button`, `Dialog`, `Alert`, etc.).
+19. **Intégration Binaire Go** : Reconnaître le pattern d'utilisation d'un binaire Go compilé (`installer`/`installer.exe`) appelé via `ddClient.extension.host.cli.exec()` pour effectuer des vérifications sur l'hôte.
+20. **Configuration GPU (`docker-compose.yaml`)** : Vérifier la présence et la syntaxe correcte de la section `deploy.resources.reservations.devices` pour l'allocation GPU NVIDIA aux conteneurs pertinents.
+21. **UI Conditionnelle** : Implémenter la logique d'affichage conditionnel dans React en se basant sur l'état des vérifications (chargement, erreur, prérequis manquants, succès).
+22. **Gestion des Erreurs (UI & Binaire)** : Implémenter une gestion d'erreur robuste lors des appels au binaire Go et afficher des messages clairs à l'utilisateur dans l'UI React.
+23. **Utilisation API Client Docker** : Utiliser correctement `@docker/extension-api-client` (`ddClient`) pour interagir avec l'API Docker Desktop (ex: `ddClient.host.platform`).
+24. **Expérience Utilisateur (Guidage)** : En cas de prérequis manquants, fournir des instructions claires et concises dans l'UI (`PrerequisitesGuide`), avec des liens pertinents (ex: téléchargement pilotes NVIDIA).
+25. **Nommage Explicite** : Utiliser des noms de variables et fonctions clairs et descriptifs.
+26. **Style de Code Existant** : Suivre le style de code déjà présent dans le projet.
+27. **Dépendances (`package.json`, `go.mod`)** : Ajouter les dépendances nécessaires lors de l'introduction de nouvelles fonctionnalités ou librairies.
+28. **Considérer les Cas Limites** : Penser aux différents états possibles (OS non supporté, erreur de commande, etc.) lors de l'implémentation de la logique de vérification.
+

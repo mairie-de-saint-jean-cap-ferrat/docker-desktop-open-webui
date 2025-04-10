@@ -1,90 +1,108 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createDockerDesktopClient } from '@docker/extension-api-client';
 import WebpageFrame from './WebpageFrame';
 import InstallView from './InstallView';
 import LoadingView from './LoadingView';
 import ToastNotification from './ToastNotification';
+import { PrerequisitesGuide } from './PrerequisitesGuide';
+import { Box, Typography } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ddClient = createDockerDesktopClient();
 
 export function App() {
-  const [error, setError] = useState('');
+  const [gpuStatus, setGpuStatus] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [platform, setPlatform] = useState<string>('');
   const [checked, setChecked] = useState(false);
-  const [installing, setInstalling] = useState(false);
-  const [installed, setInstalled] = useState(false);
-  const [started, setStarted] = useState(false);
-  const executable = `installer${ddClient.host.platform === 'win32' ? '.exe' : ''}`;
 
-  async function runInstaller(...args: string[]) {
-    const { host } = ddClient.extension;
-    if (!host) {
-      throw new Error(`Extension API does not have host`);
-    }
-    return await host.cli.exec(executable, args);
-  }
-
-  // On load, check if Ollama has already been installed.
-  useEffect(() => {
-    (async () => {
-      try {
-        const { stdout, stderr } = await runInstaller('--mode=check');
-        stderr.trim() && console.error(stderr.trimEnd());
-        console.debug(`Installation check: ${stdout.trim()}`);
-        if (stdout.trim() === 'true') {
-          // Install location exists; just start ollama.
-          setInstalled(true);
-        }
-        setChecked(true);
-      } catch (ex) {
-        console.error(ex);
-        setError(`${ex}`);
-      }
-    })();
+  const showSuccessToast = useCallback((message: string) => {
+    toast.success(message);
   }, []);
 
-  // Callback for <InstallView> to trigger the install.
-  function install() {
-    (async () => {
-      try {
-        console.log(`Installing ollama to...`);
-        setInstalling(true);
-        const { stdout, stderr } = await runInstaller('--mode=install');
-        stderr.trim() && console.error(stderr.trimEnd());
-        stdout.trim() && console.debug(stdout.trimEnd());
-        setInstalled(true);
-      } catch (ex) {
-        console.error(ex);
-        setError(`${ex}`);
-      }
-    })();
-  }
+  const showErrorToast = useCallback((message: string) => {
+    toast.error(message);
+  }, []);
 
-  // Trigger starting Ollama once it's been installed.
   useEffect(() => {
-    (async () => {
+    const checkPrerequisites = async () => {
+      setError(null);
+      setGpuStatus(null);
+      let currentPlatform = '';
       try {
-        if (installed) {
-          const { stdout, stderr } = await runInstaller('--mode=start');
-          stderr.trim() && console.error(stderr.trimEnd());
-          stdout.trim() && console.debug(stdout.trimEnd());
-          setStarted(true);
+        currentPlatform = ddClient.host.platform;
+        setPlatform(currentPlatform);
+
+        const isWindows = currentPlatform === 'win32';
+        const command = isWindows ? 'installer.exe' : 'installer';
+        
+        console.log(`Executing initial check: ${command}`);
+        const result = await ddClient.extension.host.cli.exec(command, []);
+        console.log('Initial check result:', result);
+        
+        const status = result.stdout.trim();
+        console.log(`Initial GPU Status: ${status}`);
+        setGpuStatus(status);
+
+        if (result.stderr) {
+          console.warn(`Prerequisite check stderr: ${result.stderr}`);
         }
-      } catch (ex) {
-        console.error(ex);
-        setError(`${ex}`);
+      } catch (err: any) {
+        console.error('Error checking prerequisites on load:', err);
+        const errorMessage = `Failed initial prerequisite check (${err.code || 'unknown'}): ${err.stderr || err.stdout || err.message || JSON.stringify(err)}`;
+        setError(errorMessage);
+        setGpuStatus('ERROR');
+      } finally {
+        setChecked(true);
       }
-    })();
-  }, [installed]);
+    };
+
+    checkPrerequisites();
+  }, []);
+
+  let content;
+  if (!checked) {
+    content = <LoadingView />;
+  } else if (error) {
+    content = (
+       <Box sx={{ p: 3 }}>
+        <Typography variant="h6" color="error">Erreur lors de la vérification initiale</Typography>
+        <Typography sx={{ mt: 1, color: 'error.main', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+          {error}
+        </Typography>
+         <Typography sx={{ mt: 2 }}>
+            Veuillez vérifier les logs de l'extension et essayer de rafraîchir.
+        </Typography>
+      </Box>
+    );
+  } else if (gpuStatus === 'OK') {
+    content = <WebpageFrame />;
+  } else {
+    content = <InstallView 
+                status={gpuStatus} 
+                platform={platform} 
+                showSuccessToast={showSuccessToast} 
+                showErrorToast={showErrorToast} 
+              />;
+  }
 
   return (
     <>
-      {
-        !!error ? <div className="error">{error}</div> :
-          !installed && !installing && checked ? <InstallView install={install} /> :
-            !started ? <LoadingView /> :
-              <WebpageFrame />
-      }
-      <ToastNotification />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored" 
+      />
+      {content}
     </>
   );
 }
