@@ -5,7 +5,7 @@ server:
   secret_key: "searxng-key"
   limiter: false
   image_proxy: true
-  port: 8180
+  port: 8080
   bind_address: "0.0.0.0"
 
 ui:

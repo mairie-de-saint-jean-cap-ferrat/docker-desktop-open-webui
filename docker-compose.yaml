@@ -198,7 +198,7 @@ services:
   docling-serve:
     image: quay.io/docling-project/docling-serve
     ports:
-      - "11501:5001"
+      - "11551:5001"
     environment:
       - DOCLING_SERVE_ENABLE_UI=true
     restart: always
@@ -206,14 +206,13 @@ services:
   openai-edge-tts:
     image: travisvn/openai-edge-tts:latest
     ports:
-      - "11502:5050"
+      - "11550:5050"
     restart: always
 
   jupyter:
     image: jupyter/minimal-notebook:latest
-    container_name: jupyter-notebook
     ports:
-      - "11504:8888"
+      - "11552:8888"
     volumes:
       - ./linux/jupyter:/home/jovyan/work
     environment:
