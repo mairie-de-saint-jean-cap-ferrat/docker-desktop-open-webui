@@ -26,53 +26,53 @@ export function App() {
     toast.error(message);
   }, []);
 
-  // useEffect(() => {
-  //   const checkPrerequisites = async () => {
-  //     console.log('Starting prerequisite check...');
-  //     setError(null);
-  //     setGpuStatus(null);
-  //     setChecked(false);
-  //     let currentPlatform = '';
-  //     try {
-  //       if (!ddClient.extension?.host?.cli) {
-  //         throw new Error("Docker Desktop extension host CLI API not available.");
-  //       }
-// 
-  //       console.log('Getting host platform...');
-  //       currentPlatform = ddClient.host.platform;
-  //       console.log(`Host platform: ${currentPlatform}`);
-  //       setPlatform(currentPlatform);
-// 
-  //       const isWindows = currentPlatform === 'win32';
-  //       const command = isWindows ? 'installer.exe' : 'installer';
-  //       
-  //       console.log(`Executing check command: ${command}`);
-  //       const result = await ddClient.extension.host.cli.exec(command, []);
-  //       console.log('Check command finished.', 'Result:', result);
-  //       
-  //       const status = result.stdout.trim();
-  //       console.log(`Initial GPU Status from stdout: "${status}"`);
-  //       setGpuStatus(status);
-// 
-  //       if (result.stderr) {
-  //         console.warn(`Prerequisite check command stderr: ${result.stderr}`);
-  //       }
-  //       console.log('Prerequisite check successful.');
-  //     } catch (err: any) {
-  //       console.error('Error during prerequisite check:', err);
-  //       const errorMessage = `Failed prerequisite check (${err?.code || 'unknown error'}): ${err?.stderr || err?.stdout || err?.message || JSON.stringify(err)}`;
-  //       console.log(`Setting error state: "${errorMessage}"`);
-  //       setError(errorMessage);
-  //       console.log('Setting GPU status to ERROR');
-  //       setGpuStatus('ERROR');
-  //     } finally {
-  //       console.log('Prerequisite check finished (finally block). Setting checked to true.');
-  //       setChecked(true);
-  //     }
-  //   };
-// 
-  //   checkPrerequisites();
-  // }, []);
+  useEffect(() => {
+    const checkPrerequisites = async () => {
+      console.log('Starting prerequisite check...');
+      setError(null);
+      setGpuStatus(null);
+      setChecked(false);
+      let currentPlatform = '';
+      try {
+        if (!ddClient.extension?.host?.cli) {
+          throw new Error("Docker Desktop extension host CLI API not available.");
+        }
+
+        console.log('Getting host platform...');
+        currentPlatform = ddClient.host.platform;
+        console.log(`Host platform: ${currentPlatform}`);
+        setPlatform(currentPlatform);
+
+        const isWindows = currentPlatform === 'win32';
+        const command = isWindows ? 'installer.exe' : 'installer';
+        
+        console.log(`Executing check command: ${command}`);
+        const result = await ddClient.extension.host.cli.exec(command, []);
+        console.log('Check command finished.', 'Result:', result);
+        
+        const status = result.stdout.trim();
+        console.log(`Initial GPU Status from stdout: "${status}"`);
+        setGpuStatus(status);
+
+        if (result.stderr) {
+          console.warn(`Prerequisite check command stderr: ${result.stderr}`);
+        }
+        console.log('Prerequisite check successful.');
+      } catch (err: any) {
+        console.error('Error during prerequisite check:', err);
+        const errorMessage = `Failed prerequisite check (${err?.code || 'unknown error'}): ${err?.stderr || err?.stdout || err?.message || JSON.stringify(err)}`;
+        console.log(`Setting error state: "${errorMessage}"`);
+        setError(errorMessage);
+        console.log('Setting GPU status to ERROR');
+        setGpuStatus('ERROR');
+      } finally {
+        console.log('Prerequisite check finished (finally block). Setting checked to true.');
+        setChecked(true);
+      }
+    };
+
+    checkPrerequisites();
+  }, []);
 
   console.log(`Rendering App - checked: ${checked}, error: ${error}, gpuStatus: ${gpuStatus}`);
 
