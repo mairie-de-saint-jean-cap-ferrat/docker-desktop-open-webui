@@ -44,6 +44,8 @@ COPY docker-compose.yaml .
 COPY Dockerfile.searxng .
 COPY metadata.json .
 COPY open-webui.svg .
+COPY yo-ai-lab.png .
+COPY yo-ai-lab.svg .
 COPY --from=client-builder /ui/build ui
 # Copier le binaire Go
 COPY --from=builder /backend/bin/service /service
