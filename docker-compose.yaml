@@ -6,19 +6,6 @@ services:
       - backend-data:/data
       - /var/run/docker.sock.raw:/var/run/docker.sock
 
-  searxng:
-    container_name: searxng
-    hostname: searxng
-    # build:
-    #   dockerfile: Dockerfile.searxng
-    image: ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui:searxng
-    ports:
-      - "11505:8080"
-    # volumes:
-    #   - ./linux/searxng:/etc/searxng
-    restart: always
-  
-  
   open-webui:
     image: ghcr.io/open-webui/open-webui:cuda
     container_name: open-webui
@@ -40,45 +27,46 @@ services:
     volumes:
       - open-webui:/app/backend/data
     environment:
+      # General
       - USE_CUDA_DOCKER=True
-      - WEBUI_AUTH=False
-      - WEBUI_SESSION_COOKIE_SAME_SITE=None
-      - WEBUI_SESSION_COOKIE_SECURE=True
-      - ENABLE_RAG_WEB_SEARCH=True
-      - ENABLE_EVALUATION_ARENA_MODELS=False
-      - RAG_WEB_SEARCH_ENGINE=searxng
-      - DEFAULT_MODELS=tinyllama
-      - SEARXNG_QUERY_URL=http://host.docker.internal:11505
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - RAG_OLLAMA_BASE_URL=http://host.docker.internal:11434
       # - ENV=dev
       - ENABLE_PERSISTENT_CONFIG=True
-      - ENABLE_TAGS_GENERATION=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
       - WEBUI_URL=http://localhost:11500
       # - ENABLE_SIGNUP=True
       # - ENABLE_LOGIN_FORM=True
-      - ENABLE_REALTIME_CHAT_SAVE=True
+      # - ENABLE_REALTIME_CHAT_SAVE=True
       # - ENABLE_ADMIN_EXPORT=True
       # - ENABLE_ADMIN_CHAT_ACCESS=True
-      - ENABLE_CHANNELS=True
+      # - ENABLE_CHANNELS=True
       # - ADMIN_EMAIL=""
       # - SHOW_ADMIN_DETAILS=True
       # - BYPASS_MODEL_ACCESS_CONTROL=False
+      - DEFAULT_MODELS=tinyllama
       # - DEFAULT_USER_ROLE=pending
       - DEFAULT_LOCALE=fr
-      - WEBHOOK_URL="http://localhost:11500/api/webhook"
+      # - WEBHOOK_URL="http://localhost:11500/api/webhook"
       # - WEBUI_BUILD_HASH=dev-build
+      - WEBUI_AUTH=False
+      - WEBUI_SESSION_COOKIE_SAME_SITE=None
+      - WEBUI_SESSION_COOKIE_SECURE=True
+
+      # AIOHTTP Client
       # - AIOHTTP_CLIENT_TOTAL_CONN=100
       # - AIOHTTP_CLIENT_MAX_SIZE_CONN=10
       # - AIOHTTP_CLIENT_READ_TIMEOUT=600
       # - AIOHTTP_CLIENT_CONN_TIMEOUT=60
+
+      # Logging
       # - LOG_LEVEL=INFO
       # - LOG_FORMAT=default
       # - ENABLE_FILE_LOGGING=False
       # - LOG_MAX_BYTES=10485760
       # - LOG_BACKUP_COUNT=5
+
+      # Ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
       # - OLLAMA_BASE_URLS=""
       # - OLLAMA_API_KEY=""
       # - OLLAMA_KEEP_ALIVE=""
@@ -86,6 +74,8 @@ services:
       # - OLLAMA_NUM_PARALLEL=1
       # - OLLAMA_MAX_QUEUE=100
       # - ENABLE_OLLAMA_MULTIMODAL_SUPPORT=False
+
+      # OpenAI
       - OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
       - OPENAI_API_KEY="${OPENROUTER_API_KEY}"
       - ENABLE_OPENAI_API_KEY=True
@@ -93,23 +83,37 @@ services:
       # - OPENAI_API_KEY_GENERATION_ENABLED=False
       # - OPENAI_API_KEY_GENERATION_ROLE=user
       # - OPENAI_API_KEY_EXPIRATION_TIME_IN_MINUTES=0
+
+      # Tasks
       # - TASKS_MAX_RETRIES=3
       # - TASKS_RETRY_DELAY=60
-      - ENABLE_AUTOCOMPLETE_GENERATION=True
+
+      # Autocomplete
+      # - ENABLE_AUTOCOMPLETE_GENERATION=True
       # - AUTOCOMPLETE_PROVIDER=ollama
       # - AUTOCOMPLETE_MODEL=""
       # - AUTOCOMPLETE_NO_STREAM=True
       # - AUTOCOMPLETE_INSECURE=True
+
+      # Evaluation Arena Model
+      - ENABLE_EVALUATION_ARENA_MODELS=False
       # - EVALUATION_ARENA_MODELS_TAGS_ENABLED=False
       # - EVALUATION_ARENA_MODELS_TAGS_GENERATION_MODEL=""
       # - EVALUATION_ARENA_MODELS_TAGS_GENERATION_PROMPT=""
       # - EVALUATION_ARENA_MODELS_TAGS_GENERATION_PROMPT_MIN_LENGTH=100
+
+      # Tags Generation
+      - ENABLE_TAGS_GENERATION=True
+
+      # API Key Endpoint Restrictions
       # - API_KEYS_ENDPOINT_ACCESS_NONE=True
       # - API_KEYS_ENDPOINT_ACCESS_ALL=False
+
+      # RAG
       - ENABLE_RAG=True
       # - RAG_EMBEDDING_ENGINE=ollama
       # - RAG_EMBEDDING_MODEL="nomic-embed-text"
-      - RAG_EMBEDDING_MODEL_AUTOUPDATE=True
+      # - RAG_EMBEDDING_MODEL_AUTOUPDATE=True
       # - RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE=False
       # - RAG_EMBEDDING_OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
       # - RAG_EMBEDDING_OPENAI_API_KEY="${OPENROUTER_API_KEY}"
@@ -126,6 +130,11 @@ services:
       - RAG_PDF_EXTRACTION_LIBRARY=pypdf
       - PDF_EXTRACT_IMAGES=True
       # - RAG_COPY_UPLOADED_FILES_TO_VOLUME=False
+
+      # Web Search
+      - ENABLE_RAG_WEB_SEARCH=True
+      - RAG_WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://host.docker.internal:11505
       # - RAG_WEB_SEARCH_LLM_TIMEOUT=120
       # - RAG_WEB_SEARCH_RESULT_COUNT=3
       # - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
@@ -135,30 +144,42 @@ services:
       - RAG_GOOGLE_SEARCH_ENGINE_ID="${GOOGLE_SEARCH_ENGINE_ID}"
       - RAG_SERPER_API_KEY="${SERPER_API_KEY}"
       - RAG_SERPAPI_API_KEY="${SERPAPI_API_KEY}"
-      - RAG_DUCKDUCKGO_SEARCH_ENABLED=True
+      # - RAG_DUCKDUCKGO_SEARCH_ENABLED=True
       - RAG_SEARCHAPI_API_KEY="${SEARCHAPI_API_KEY}"
+
+      # Web Loader
       # - RAG_WEB_LOADER_URL_BLACKLIST=""
       # - RAG_WEB_LOADER_CONTINUE_ON_FAILURE=False
-      - RAG_WEB_LOADER_MODE=html2text
-      - RAG_WEB_LOADER_SSL_VERIFICATION=True
+      # - RAG_WEB_LOADER_MODE=html2text
+      # - RAG_WEB_LOADER_SSL_VERIFICATION=True
+
+      # YouTube Loader
       - RAG_YOUTUBE_LOADER_LANGUAGE=fr
       - RAG_YOUTUBE_LOADER_TRANSLATION=fr
       - RAG_YOUTUBE_LOADER_ADD_VIDEO_INFO=True
       - RAG_YOUTUBE_LOADER_CONTINUE_ON_FAILURE=False
-      - WHISPER_MODEL=base
-      - WHISPER_MODEL_AUTOUPDATE=True
+
+      # Audio - Whisper
+      # - WHISPER_MODEL=base
+      # - WHISPER_MODEL_AUTOUPDATE=True
       # - WHISPER_MODEL_TRUST_REMOTE_CODE=False
       # - WHISPER_DEVICE=cuda
+
+      # Audio - Speech-to-Text
       - AUDIO_STT_MODEL="whisper-1"
       - AUDIO_STT_ENGINE="openai"
       - AUDIO_STT_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
       - AUDIO_STT_OPENAI_API_KEY="${OPENAI_API_KEY}"
-      - AZURE_TTS_KEY="${AZURE_TTS_KEY}"
-      - AZURE_TTS_REGION="${AZURE_TTS_REGION}"
+
+      # Audio - Text-to-Speech
+      #- AZURE_TTS_KEY="${AZURE_TTS_KEY}"
+      #- AZURE_TTS_REGION="${AZURE_TTS_REGION}"
       - AUDIO_TTS_MODEL="tts-1"
       - AUDIO_TTS_ENGINE="openai"
       - AUDIO_TTS_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
       - AUDIO_TTS_OPENAI_API_KEY="${OPENAI_API_KEY}"
+
+      # Image Generation
       - ENABLE_IMAGE_GENERATION=True
       - IMAGE_GENERATION_ENGINE="openai"
       - IMAGE_GENERATION_MODEL="gpt-4o"
@@ -166,15 +187,16 @@ services:
       - IMAGES_OPENAI_API_KEY="${OPENAI_API_KEY}"
       # - AUTOMATIC1111_BASE_URL=""
       # - COMFYUI_BASE_URL=""
-      # - OPENAI_DALLE_API_BASE_URL="https://api.openai.com/v1/" # Covered by IMAGES_OPENAI_API_BASE_URL
-      # - OPENAI_DALLE_API_KEY="${OPENAI_API_KEY}" # Covered by IMAGES_OPENAI_API_KEY
-      # S3 Configuration (MinIO)
+
+      # Storage - S3 (MinIO)
       - STORAGE_PROVIDER=s3
-      - S3_ACCESS_KEY_ID=minioadmin # Fixed access key
-      - S3_SECRET_ACCESS_KEY=minioadmin # Fixed secret key
-      - S3_BUCKET_NAME="open-webui-data" # Default bucket name if not provided
-      - S3_ENDPOINT_URL=http://host.docker.internal:11557 # Internal endpoint for service communication
-      - S3_REGION_NAME=us-east-1 # Common default for MinIO
+      - S3_ACCESS_KEY_ID=minioadmin
+      - S3_SECRET_ACCESS_KEY=minioadmin
+      - S3_BUCKET_NAME="open-webui-data"
+      - S3_ENDPOINT_URL=http://host.docker.internal:11557
+      - S3_REGION_NAME=us-east-1
+
+      # OAuth
       # - ENABLE_OAUTH_LOGIN=False
       # - ENABLE_OAUTH_SIGNUP=False
       # - OAUTH_METADATA_URL=""
@@ -194,6 +216,8 @@ services:
       # - OAUTH_DISPLAY_NAME=OpenID
       # - OAUTH_LOGIN_BUTTON_TEXT=Sign in with OpenID
       # - OAUTH_TIMEOUT=10
+
+      # LDAP
       # - LDAP_ENABLED=False
       # - LDAP_URL=""
       # - LDAP_PORT=389
@@ -213,12 +237,18 @@ services:
       # - LDAP_AUTO_CREATE_ACCOUNT=False
       # - LDAP_AUTO_UPDATE_ACCOUNT_INFO=False
       # - LDAP_TIMEOUT=10
+
+      # Permissions
       # - ENABLE_WORKSPACE_PERMISSIONS=False
       # - ENABLE_CHAT_PERMISSIONS=False
+
+      # Database Pool
       # - DATABASE_POOL_SIZE=0
       # - DATABASE_POOL_MAX_OVERFLOW=0
       # - DATABASE_POOL_TIMEOUT=30
       # - DATABASE_POOL_RECYCLE=3600
+
+      # Redis
       - REDIS_URL="redis://host.docker.internal:11558"
       # - REDIS_SENTINEL_HOSTS=""
       # - REDIS_SENTINEL_PORT=26379
@@ -227,15 +257,62 @@ services:
       # - WEBSOCKET_REDIS_URL="redis://host.docker.internal:11559"
       # - WEBSOCKET_SENTINEL_HOSTS=""
       # - WEBSOCKET_SENTINEL_PORT=26379
+
+      # Uvicorn
       # - UVICORN_WORKERS=1
+
+      # Proxy Settings
       # - http_proxy=""
       # - https_proxy=""
       # - no_proxy=""
+
+      # PIP Settings
       # - PIP_OPTIONS=""
       # - PIP_PACKAGE_INDEX_OPTIONS=""
+
+      # Apache Tika
       - TIKA_SERVER_URL="http://host.docker.internal:11560"
     restart: always
 
+  # LibreTranslate server local
+  libretranslate:
+    container_name: libretranslate
+    image: libretranslate/libretranslate:v1.6.0
+    restart: unless-stopped
+    ports:
+      - "11553:5000"
+    environment:
+      - LT_DEBUG="false"
+      - LT_UPDATE_MODELS="true"
+      - LT_SSL="false"
+      - LT_SUGGESTIONS="false"
+      - LT_METRICS="false"
+      - LT_HOST="0.0.0.0"
+      - LT_API_KEYS="false"
+      - LT_THREADS="12"
+      - LT_FRONTEND_TIMEOUT="2000"
+    volumes:
+      - libretranslate_api_keys:/app/db
+      - libretranslate_models:/home/libretranslate/.local:rw
+    tty: true
+    stdin_open: true
+    healthcheck:
+      test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
+      
+  # SearxNG
+  searxng:
+    container_name: searxng
+    hostname: searxng
+    # build:
+    #   dockerfile: Dockerfile.searxng
+    image: ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui:searxng
+    ports:
+      - "11505:8080"
+    # volumes:
+    #   - ./linux/searxng:/etc/searxng
+    restart: always
+  
+  # OCR Server
   docling-serve:
     image: quay.io/docling-project/docling-serve
     container_name: docling-serve
@@ -246,6 +323,7 @@ services:
       - DOCLING_SERVE_ENABLE_UI=true
     restart: always
 
+  # OpenAI Edge TTS
   openai-edge-tts:
     image: travisvn/openai-edge-tts:latest
     container_name: openai-edge-tts
@@ -254,6 +332,7 @@ services:
       - "11550:5050"
     restart: always
 
+  # Jupyter Notebook
   jupyter:
     image: jupyter/minimal-notebook:latest
     container_name: jupyter
@@ -267,6 +346,7 @@ services:
       - JUPYTER_TOKEN=123456
     restart: always
 
+  # MinIO
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -283,6 +363,7 @@ services:
     command: server /data --console-address ":11556"
     restart: always
 
+  # Ollama
   ollama:
     image: ollama/ollama
     container_name: ollama
@@ -299,7 +380,8 @@ services:
     volumes:
       - ollama:/root/.ollama
     restart: always
-  
+
+  # Redis
   redis:
     image: redis:latest
     container_name: redis
@@ -320,6 +402,7 @@ services:
   #     - redis-ws:/data
   #   restart: always
 
+  # Apache Tika
   tika:
     image: apache/tika:latest
     container_name: tika
@@ -409,6 +492,8 @@ volumes:
   memory:
   sqlite:
   mcp-redis:
+  libretranslate_models:
+  libretranslate_api_keys:
 
 
 
