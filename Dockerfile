@@ -45,13 +45,7 @@ COPY Dockerfile.searxng .
 COPY metadata.json .
 COPY open-webui.svg .
 COPY --from=client-builder /ui/build ui
-# Copier seulement le binaire Go modifié
-COPY --from=builder /installer/bin/installer-linux /linux/installer
-COPY --from=builder /installer/bin/installer-darwin /darwin/installer
-COPY --from=builder /installer/bin/installer-windows.exe /windows/installer.exe
-# Supprimer la copie des fichiers SearXNG s'ils ne sont plus nécessaires
-COPY /searxng/limiter.toml /linux/searxng/limiter.toml
-COPY /searxng/settings.yml /linux/searxng/settings.yml
-COPY /searxng/uwsgi.ini /linux/searxng/uwsgi.ini
+# Copier le binaire Go
+COPY --from=builder /backend/bin/service /service
 
 CMD /service -socket /run/guest-services/backend.sock
