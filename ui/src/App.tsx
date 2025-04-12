@@ -87,6 +87,8 @@ export function App() {
 
   // Function to reload config from settings
   const reloadConfigFromSettings = useCallback(() => {
+      // Use type assertion for ddClient here
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ddClient as any).extension.settings.get(APP_CONFIG_STORAGE_KEY).then((loadedConfig: unknown) => { // Add type :unknown
           if (typeof loadedConfig === 'object' && loadedConfig !== null) {
               // Use type assertion for safety
@@ -166,24 +168,30 @@ export function App() {
     setIsLoading(true);
     try {
       // 1. Save the entire configuration object
+      // Use type assertion for ddClient here
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (ddClient as any).extension.settings.set(APP_CONFIG_STORAGE_KEY, appConfigInput);
       setPrimaryKeyLoaded(!!appConfigInput.OPENROUTER_API_KEY);
       setSnackbarState({ open: true, message: 'Configuration saved. Restarting services...', severity: 'success' });
 
       // 2. Filter out empty values before passing to env
       const envVars = Object.entries(appConfigInput)
-        .filter(([key, value]) => value)
+        .filter(([_key, value]) => value) // Use _key for unused variable
         .reduce((acc, [key, value]) => {
           acc[key] = value;
           return acc;
         }, {} as Record<string, string>);
 
       // 3. Trigger docker compose up with the new config
+      // eslint-disable-next-line no-console
       console.log('Starting docker compose up with env:', envVars);
+      // Use type assertion for ddClient here
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (ddClient as any).docker.compose.up({
         composeFiles: ['docker-compose.yaml'],
         env: envVars,
       });
+      // eslint-disable-next-line no-console
       console.log('Docker compose up finished.');
 
       setIsModalOpen(false);
