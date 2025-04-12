@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { DockerMuiThemeProvider  } from "@docker/docker-mui-theme";
+import { DockerMuiV6ThemeProvider  } from "@docker/docker-mui-theme";
 import './main.css';
 
 import { App } from './App';
 
-window.__ddMuiThemes = {
+window.__ddMuiV6Themes = {
   dark: createTheme({
     palette: {
       mode: "dark",
@@ -28,9 +28,9 @@ window.__ddMuiThemes = {
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <DockerMuiThemeProvider>
+    <DockerMuiV6ThemeProvider>
       <CssBaseline />
       <App />
-    </DockerMuiThemeProvider>
+    </DockerMuiV6ThemeProvider>
   </React.StrictMode>
 );
