@@ -78,22 +78,22 @@ export function App() {
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
 
-  // Function to reload config from settings
-  const reloadConfigFromSettings = useCallback(() => {
-      // Use the extension settings path, asserting type as any to bypass potential TS issues
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ddClient as any).extension.settings.get(APP_CONFIG_STORAGE_KEY).then((loadedConfig: unknown) => { // Add type :unknown
-          if (typeof loadedConfig === 'object' && loadedConfig !== null) {
-              // Use type assertion for safety
-              setAppConfigInput({ ...defaultConfig, ...(loadedConfig as Partial<AppConfig>) });
-          } else {
-              setAppConfigInput(defaultConfig); // Reset if nothing was saved
-          }
-      }).catch((err: unknown) => { // Explicitly type err as unknown
-          console.error("Error reloading config:", err);
-          setSnackbarState({ open: true, message: 'Error reloading saved configuration.', severity: 'error' });
-          setAppConfigInput(defaultConfig); // Reset on error too
-      });
+  // Function to reload config from backend service
+  const reloadConfigFromSettings = useCallback(async () => {
+    try {
+      // Use ddClient.extension.vm.service to call the backend GET endpoint
+      const loadedConfig = await ddClient.extension.vm.service.get('/api/config');
+      if (typeof loadedConfig === 'object' && loadedConfig !== null) {
+        setAppConfigInput({ ...defaultConfig, ...(loadedConfig as Partial<AppConfig>) });
+      } else {
+        setAppConfigInput(defaultConfig);
+      }
+    } catch (err: unknown) {
+      console.error("Error reloading config from backend:", err);
+      // Avoid showing error snackbar on initial load if config simply doesn't exist yet
+      // setSnackbarState({ open: true, message: 'Error reloading saved configuration from backend.', severity: 'error' });
+      setAppConfigInput(defaultConfig);
+    }
   }, [ddClient]);
 
   // Load saved configuration on component mount
@@ -158,10 +158,8 @@ export function App() {
 
     setIsLoading(true);
     try {
-      // 1. Save the entire configuration object
-      // Use the extension settings path, asserting type as any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (ddClient as any).extension.settings.set(APP_CONFIG_STORAGE_KEY, appConfigInput);
+      // 1. Save the configuration object via backend service
+      await ddClient.extension.vm.service.post('/api/config', appConfigInput);
       setPrimaryKeyLoaded(!!appConfigInput.OPENROUTER_API_KEY);
       setSnackbarState({ open: true, message: 'Configuration saved. Restarting services...', severity: 'success' });
 
@@ -174,7 +172,7 @@ export function App() {
         }, {} as Record<string, string>);
 
       // 3. Trigger docker compose up with the new config
-      await (ddClient as any).docker.compose.up({
+      await ddClient.docker.compose.up({
         composeFiles: ['docker-compose.yaml'],
         env: envVars,
       });

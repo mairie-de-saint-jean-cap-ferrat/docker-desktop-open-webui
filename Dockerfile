@@ -28,15 +28,15 @@ RUN npm run build
 
 FROM alpine
 # Mettre à jour les labels si nécessaire, supprimer les références obsolètes
-LABEL org.opencontainers.image.title="y0n1x's AI Lab" \
+LABEL org.opencontainers.image.title="y0n1x's AI Lab - Open-WebUI" \
     org.opencontainers.image.description="y0n1x's AI Lab for Docker Desktop" \
-    org.opencontainers.image.vendor="y0n1x@maytech06.com" \
+    org.opencontainers.image.vendor="contact@maytech06.com" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \
     com.docker.desktop.extension.icon="https://raw.githubusercontent.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui/refs/heads/main/yo-ai-lab.png" \
-    com.docker.extension.detailed-description="" \
-    com.docker.extension.publisher-url="" \
-    com.docker.extension.additional-urls="" \
+    com.docker.extension.detailed-description="AI Lab with Open-WebUI, CUDA, Ollama, Tika, Redis, Minio, SearxNG, Docling-Serve, OpenAI Edge TTS, and more. An OpenRouter API key is required." \
+    com.docker.extension.publisher-url="https://github.com/yonix06/" \
+    com.docker.extension.additional-urls="https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui/" \
     com.docker.extension.categories="AI" \
     com.docker.extension.changelog=""
 
