@@ -1,20 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import LoadingView from './LoadingView';
+import React from 'react'
 
 const WebpageFrame = () => {
-  const [hideIframeView, setHideIframeView] = useState(true);
-
-  useEffect(() => {
-    const showIframeViewAfterInterval = async (time: number) => {
-      await new Promise(resolve => setTimeout(resolve, time));
-      setHideIframeView(false);
-    };
-    showIframeViewAfterInterval(1000);
-  }, []);
-
   return (
     <>
-      {hideIframeView && <LoadingView />}
       <iframe
         src="http://host.docker.internal:11500"
         style={{
@@ -24,12 +12,10 @@ const WebpageFrame = () => {
           width: '100%',
           height: '100%',
           border: 'none',
-          opacity: hideIframeView ? 0 : 1,
-          transition: 'opacity 0.5s ease-in-out'        
         }}
       />
     </>
-  );
-};
+  )
+}
 
 export default WebpageFrame;

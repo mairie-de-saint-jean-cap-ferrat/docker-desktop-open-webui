@@ -1,6 +1,6 @@
 services:
 
-  ui:
+  docker-desktop-open-webui:
     image: ${DESKTOP_PLUGIN_IMAGE}
   searxng:
     container_name: searxng
