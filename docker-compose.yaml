@@ -33,7 +33,6 @@ services:
       - ollama
       - minio
       - tika
-      - redis-ws
       - redis
     ports:
       - "11500:8080"
