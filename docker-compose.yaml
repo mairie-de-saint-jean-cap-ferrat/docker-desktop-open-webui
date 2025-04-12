@@ -2,6 +2,8 @@ services:
 
   docker-desktop-open-webui:
     image: ${DESKTOP_PLUGIN_IMAGE}
+    volumes:
+          - backend-data:/data
 
   searxng:
     container_name: searxng
@@ -220,9 +222,9 @@ services:
       - REDIS_URL="redis://host.docker.internal:11558"
       # - REDIS_SENTINEL_HOSTS=""
       # - REDIS_SENTINEL_PORT=26379
-      - ENABLE_WEBSOCKET_SUPPORT=True
-      - WEBSOCKET_MANAGER=redis
-      - WEBSOCKET_REDIS_URL="redis://host.docker.internal:11559"
+      # - ENABLE_WEBSOCKET_SUPPORT=True
+      # - WEBSOCKET_MANAGER=redis
+      # - WEBSOCKET_REDIS_URL="redis://host.docker.internal:11559"
       # - WEBSOCKET_SENTINEL_HOSTS=""
       # - WEBSOCKET_SENTINEL_PORT=26379
       # - UVICORN_WORKERS=1
@@ -308,15 +310,15 @@ services:
       - redis:/data
     restart: always
 
-  redis-ws:
-    image: redis:latest
-    container_name: redis-ws
-    hostname: redis-ws
-    ports:
-      - "11559:6379"
-    volumes:
-      - redis-ws:/data
-    restart: always
+  # redis-ws:
+  #   image: redis:latest
+  #   container_name: redis-ws
+  #   hostname: redis-ws
+  #   ports:
+  #     - "11559:6379"
+  #   volumes:
+  #     - redis-ws:/data
+  #   restart: always
 
   tika:
     image: apache/tika:latest
@@ -327,6 +329,7 @@ services:
     restart: always
 
 volumes:
+  backend-data: {}
   open-webui:
   ollama:
   jupyter:
