@@ -87,14 +87,14 @@ export function App() {
 
   // Function to reload config from settings
   const reloadConfigFromSettings = useCallback(() => {
-      ddClient.extension.settings.get(APP_CONFIG_STORAGE_KEY).then((loadedConfig: unknown) => { // Add type :unknown
+      (ddClient as any).extension.settings.get(APP_CONFIG_STORAGE_KEY).then((loadedConfig: unknown) => { // Add type :unknown
           if (typeof loadedConfig === 'object' && loadedConfig !== null) {
               // Use type assertion for safety
               setAppConfigInput({ ...defaultConfig, ...(loadedConfig as Partial<AppConfig>) });
           } else {
               setAppConfigInput(defaultConfig); // Reset if nothing was saved
           }
-      }).catch(err => { // Add catch block
+      }).catch((err: unknown) => { // Explicitly type err as unknown
           console.error("Error reloading config:", err);
           setSnackbarState({ open: true, message: 'Error reloading saved configuration.', severity: 'error' });
           setAppConfigInput(defaultConfig); // Reset on error too
@@ -112,7 +112,7 @@ export function App() {
         // This requires awaiting the promise or checking state in a subsequent effect
         // Let's simplify and check after loading state settles
 
-      } catch (err) {
+      } catch (err: unknown) { // Ensure 'err' is typed as unknown
          // Error handling is now within reloadConfigFromSettings
          console.error('Initial config load wrapper error (should be handled inside reload):', err);
       } finally {
@@ -166,7 +166,7 @@ export function App() {
     setIsLoading(true);
     try {
       // 1. Save the entire configuration object
-      await ddClient.extension.settings.set(APP_CONFIG_STORAGE_KEY, appConfigInput);
+      await (ddClient as any).extension.settings.set(APP_CONFIG_STORAGE_KEY, appConfigInput);
       setPrimaryKeyLoaded(!!appConfigInput.OPENROUTER_API_KEY);
       setSnackbarState({ open: true, message: 'Configuration saved. Restarting services...', severity: 'success' });
 
@@ -180,7 +180,7 @@ export function App() {
 
       // 3. Trigger docker compose up with the new config
       console.log('Starting docker compose up with env:', envVars);
-      await ddClient.docker.compose.up({
+      await (ddClient as any).docker.compose.up({
         composeFiles: ['docker-compose.yaml'],
         env: envVars,
       });
@@ -193,10 +193,10 @@ export function App() {
         severity: 'success',
       });
 
-    } catch (err: any) {
+    } catch (err: unknown) { // Ensure 'err' is typed as unknown
       console.error('Error saving config or restarting services:', err);
       let errorMessage = 'Failed to save configuration or restart services.';
-      if (err?.message) {
+      if (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string') { // Safer error message extraction
         errorMessage = `Error: ${err.message}`;
       } else if (typeof err === 'string') {
         errorMessage = `Error: ${err}`;
