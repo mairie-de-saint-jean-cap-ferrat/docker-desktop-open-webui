@@ -1,4 +1,7 @@
 services:
+
+  ui:
+    image: ${DESKTOP_PLUGIN_IMAGE}
   searxng:
     container_name: searxng
     hostname: searxng
@@ -10,7 +13,6 @@ services:
     # volumes:
     #   - ./linux/searxng:/etc/searxng
     restart: always
-  
   
   
   open-webui:

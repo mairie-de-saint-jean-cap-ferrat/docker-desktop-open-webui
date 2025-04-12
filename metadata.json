@@ -1,5 +1,5 @@
 {
-  "icon": "yo-ai-lab.png",
+  "icon": "yo-ai-lab.svg",
   "vm": {
     "composefile": "docker-compose.yaml",
     "exposes": {
@@ -13,76 +13,8 @@
       "root": "ui"
     }
   },
-  "host": {
-    "binaries": [
-      {
-        "darwin": [
-          {
-            "path": "/darwin/installer"
-          }
-        ],
-        "linux": [
-          {
-            "path": "/linux/installer"
-          },
-          {
-            "path": "/linux/searxng/limiter.toml"
-          },
-          {
-            "path": "/linux/searxng/settings.yml"
-          },
-          {
-            "path": "/linux/searxng/uwsgi.ini"
-          }
-        ],
-        "windows": [
-          {
-            "path": "/windows/installer.exe"
-          }
-        ]
-      }
-    ],
-    "x-rd-install": {
-      "darwin": [
-        "installer",
-        "-mode=install"
-      ],
-      "linux": [
-        "installer",
-        "-mode=install"
-      ],
-      "windows": [
-        "installer.exe",
-        "-mode=install"
-      ]
-    },
-    "x-rd-uninstall": {
-      "darwin": [
-        "installer",
-        "-mode=uninstall"
-      ],
-      "linux": [
-        "installer",
-        "-mode=uninstall"
-      ],
-      "windows": [
-        "installer.exe",
-        "-mode=uninstall"
-      ]
-    },
-    "x-rd-shutdown": {
-      "darwin": [
-        "installer",
-        "-mode=shutdown"
-      ],
-      "linux": [
-        "installer",
-        "-mode=shutdown"
-      ],
-      "windows": [
-        "installer.exe",
-        "-mode=shutdown"
-      ]
-    }
-  }
+  "name": "y0n1x's AI Lab",
+  "description": "y0n1x's AI Lab for Docker Desktop",
+  "author": "y0n1x",
+  "license": "GPLv3"
 }
