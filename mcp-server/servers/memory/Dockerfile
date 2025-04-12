@@ -1,57 +1,24 @@
-# syntax=docker/dockerfile:1
+FROM node:22.12-alpine AS builder
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
-
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
-ARG PYTHON_VERSION=3.10.12
-FROM python:${PYTHON_VERSION}-slim as base
-
-# Prevents Python from writing pyc files.
-ENV PYTHONDONTWRITEBYTECODE=1
-
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
-ENV PYTHONUNBUFFERED=1
+COPY src/memory /app
+COPY tsconfig.json /tsconfig.json
 
 WORKDIR /app
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
+RUN --mount=type=cache,target=/root/.npm npm install
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+RUN --mount=type=cache,target=/root/.npm-production npm ci --ignore-scripts --omit-dev
 
-# Change the ownership of /app/data directory and its contents to appuser
-RUN mkdir -p /app/data && touch /app/data/memory.json && chown -R ${UID}:${UID} /app/data
+FROM node:22-alpine AS release
 
-# Set a flag for the location of the database
-ENV MEMORY_FILE_PATH="/app/data/memory.json"
+COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/package.json /app/package.json
+COPY --from=builder /app/package-lock.json /app/package-lock.json
 
-# Switch to the non-privileged user to run the application.
-USER appuser
+ENV NODE_ENV=production
 
-# Copy the source code into the container.
-COPY . .
+WORKDIR /app
 
-# Expose the port that the application listens on.
-EXPOSE 8000
+RUN npm ci --ignore-scripts --omit-dev
 
-# Run the application.
-CMD uvicorn 'main:app' --host=0.0.0.0 --port=8000
+ENTRYPOINT ["node", "dist/index.js"]

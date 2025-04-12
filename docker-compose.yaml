@@ -334,23 +334,65 @@ services:
     tty: true        # equivalent of -t (often needed with -i)
     # --rm is handled by compose up/down lifecycle
 
-  filesystem-server:
-    build:
-      context: mcp-server/servers/filesystem
+  filesystem-mcp-tool:
+    image: mcp/filesystem
+    command:
+      - /projects
     ports:
-      - 8081:8000
-  memory-server:
-    build:
-      context: mcp-server/servers/memory
+      - 11561:8000
+    volumes:
+      - /workspaces:/projects/workspaces
+  memory-mcp-tool:
+    image: mcp/memory
     ports:
-      - 8082:8000
+      - 11562:8000
     volumes:
       - memory:/app/data:rw
-  time-server:
-    build:
-      context: mcp-server/servers/time
+  time-mcp-tool:
+    image: mcp/time
     ports:
-      - 8083:8000
+      - 11563:8000
+  weather-mcp-tool:
+    build:
+      context: mcp-server/servers/weather
+    ports:
+      - 11564:8000
+  get-user-info-mcp-tool:
+    build:
+      context: mcp-server/servers/get-user-info
+    ports:
+      - 11565:8000
+  fetch-mcp-tool:
+    image: mcp/fetch
+    ports:
+      - 11566:8000
+  everything-mcp-tool:
+    image: mcp/everything
+    ports:
+      - 11567:8000
+    
+  sequentialthinking-mcp-tool:
+    image: mcp/sequentialthinking
+    ports:
+      - 11567:8000
+  sqlite-mcp-tool:
+    image: mcp/sqlite
+    command:
+      - --db-path
+      - /mcp/open-webui.db
+    ports:
+      - 11568:8000
+    volumes:
+      - sqlite:/mcp
+    
+  redis-mcp-tool:
+    image: mcp/redis
+    command:
+      - redis://host.docker.internal:11558
+    ports:
+      - 11569:6379
+    volumes:
+      - mcp-redis:/data
 
 volumes:
   backend-data: {}
@@ -364,6 +406,8 @@ volumes:
   openai-edge-tts:
   docling-serve:
   memory:
+  sqlite:
+  mcp-redis:
 
 
 

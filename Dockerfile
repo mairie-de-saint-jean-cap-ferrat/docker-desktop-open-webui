@@ -40,6 +40,8 @@ LABEL org.opencontainers.image.title="y0n1x's AI Lab - Open-WebUI" \
     com.docker.extension.categories="AI" \
     com.docker.extension.changelog=""
 
+COPY mcp-server /mcp-server
+# COPY mcp-server/Dockerfile.mcp-server .
 COPY docker-compose.yaml .
 COPY Dockerfile.searxng .
 COPY metadata.json .
