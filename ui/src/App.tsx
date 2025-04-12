@@ -85,37 +85,54 @@ export function App() {
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
 
+  // Function to reload config from settings
+  const reloadConfigFromSettings = useCallback(() => {
+      ddClient.extension.settings.get(APP_CONFIG_STORAGE_KEY).then((loadedConfig: unknown) => { // Add type :unknown
+          if (typeof loadedConfig === 'object' && loadedConfig !== null) {
+              // Use type assertion for safety
+              setAppConfigInput({ ...defaultConfig, ...(loadedConfig as Partial<AppConfig>) });
+          } else {
+              setAppConfigInput(defaultConfig); // Reset if nothing was saved
+          }
+      }).catch(err => { // Add catch block
+          console.error("Error reloading config:", err);
+          setSnackbarState({ open: true, message: 'Error reloading saved configuration.', severity: 'error' });
+          setAppConfigInput(defaultConfig); // Reset on error too
+      });
+  }, [ddClient]);
+
   // Load saved configuration on component mount
   useEffect(() => {
     const loadAppConfig = async () => {
       setIsLoading(true);
       try {
-        const loadedConfig = await ddClient.extension.settings.get(APP_CONFIG_STORAGE_KEY);
+        // Use the reload function directly
+        await reloadConfigFromSettings();
+        // Need to check the state *after* reload attempts to set primary key status
+        // This requires awaiting the promise or checking state in a subsequent effect
+        // Let's simplify and check after loading state settles
 
-        if (typeof loadedConfig === 'object' && loadedConfig !== null) {
-          const mergedConfig = { ...defaultConfig, ...loadedConfig };
-          setAppConfigInput(mergedConfig);
-          setPrimaryKeyLoaded(!!mergedConfig.OPENROUTER_API_KEY);
-        } else {
-          setAppConfigInput(defaultConfig);
-          setPrimaryKeyLoaded(false);
-        }
       } catch (err) {
-        console.error('Error loading saved app config:', err);
-        setSnackbarState({
-          open: true,
-          message: 'Error loading saved configuration.',
-          severity: 'error',
-        });
-        setAppConfigInput(defaultConfig);
-        setPrimaryKeyLoaded(false);
+         // Error handling is now within reloadConfigFromSettings
+         console.error('Initial config load wrapper error (should be handled inside reload):', err);
       } finally {
+        // Check primary key status AFTER the config state might have been updated
+        // Need a slight delay or another effect, checking immediately might be too soon
+        // Simplest: derive primaryKeyLoaded directly from state in render/effects below
         setInitialCheckDone(true);
         setIsLoading(false);
       }
     };
     loadAppConfig();
-  }, [ddClient]);
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ddClient]); // reloadConfigFromSettings has ddClient dependency
+
+  // Update primary key status based on loaded config state
+  useEffect(() => {
+      if(initialCheckDone) { // Only run after initial load attempt
+         setPrimaryKeyLoaded(!!appConfigInput.OPENROUTER_API_KEY);
+      }
+  }, [appConfigInput, initialCheckDone]);
 
   // Open modal if primary key is not set after initial check
   useEffect(() => {
@@ -207,15 +224,20 @@ export function App() {
     if ((reason === 'backdropClick' || reason === 'escapeKeyDown') && !primaryKeyLoaded) {
       return;
     }
-    // Reload config from settings when closing manually
-    ddClient.extension.settings.get(APP_CONFIG_STORAGE_KEY).then(loadedConfig => {
-      if (typeof loadedConfig === 'object' && loadedConfig !== null) {
-        setAppConfigInput({ ...defaultConfig, ...loadedConfig });
-      } else {
-         setAppConfigInput(defaultConfig); // Reset if nothing was saved
-      }
-    });
+    // Reload config only if the key was loaded initially
+    if (primaryKeyLoaded) {
+        reloadConfigFromSettings();
+    }
     setIsModalOpen(false);
+  };
+
+  // Specific handler for the Cancel button click
+  const handleCancelClick = () => {
+      // Reload config only if the key was loaded initially (user might have changed inputs)
+      if (primaryKeyLoaded) {
+          reloadConfigFromSettings();
+      }
+      setIsModalOpen(false);
   };
 
   return (
@@ -277,7 +299,7 @@ export function App() {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ p: '16px 24px' }}>
-          <Button onClick={handleModalClose} disabled={isLoading}>
+          <Button onClick={handleCancelClick} disabled={isLoading}>
             Cancel
           </Button>
           <Button

@@ -8,8 +8,8 @@
     "@docker/extension-api-client": "0.3.4",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
-    "@mui/material": "^5.15.22",
     "@mui/icons-material": "^5.16.5",
+    "@mui/material": "^5.15.22",
     "axios": "^1.8.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -22,7 +22,7 @@
     "test": "jest src"
   },
   "devDependencies": {
-    "@docker/extension-api-client-types": "0.3.4",
+    "@docker/extension-api-client-types": "^0.3.4",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.0",
     "@types/react": "18.3.12",
