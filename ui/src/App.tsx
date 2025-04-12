@@ -36,10 +36,6 @@ interface AppConfig {
   SERPER_API_KEY: string;
   SERPAPI_API_KEY: string;
   SEARCHAPI_API_KEY: string;
-  // MinIO Config
-  MINIO_ACCESS_KEY: string;
-  MINIO_SECRET_KEY: string;
-  MINIO_BUCKET_NAME: string;
 }
 
 // Updated Default state for the configuration
@@ -54,9 +50,6 @@ const defaultConfig: AppConfig = {
   SERPER_API_KEY: '',
   SERPAPI_API_KEY: '',
   SEARCHAPI_API_KEY: '',
-  MINIO_ACCESS_KEY: '',
-  MINIO_SECRET_KEY: '',
-  MINIO_BUCKET_NAME: '',
 };
 
 // Key for storing the entire configuration object
@@ -87,9 +80,8 @@ export function App() {
 
   // Function to reload config from settings
   const reloadConfigFromSettings = useCallback(() => {
-      // Use type assertion for ddClient here
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ddClient as any).extension.settings.get(APP_CONFIG_STORAGE_KEY).then((loadedConfig: unknown) => { // Add type :unknown
+      // Use the correct API path
+      ddClient.desktopUI.settings.get(APP_CONFIG_STORAGE_KEY).then((loadedConfig: unknown) => { // Add type :unknown
           if (typeof loadedConfig === 'object' && loadedConfig !== null) {
               // Use type assertion for safety
               setAppConfigInput({ ...defaultConfig, ...(loadedConfig as Partial<AppConfig>) });
@@ -162,15 +154,12 @@ export function App() {
       });
       return;
     }
-    // Optional: Add validation for MinIO keys if desired
-    // if (!appConfigInput.MINIO_ACCESS_KEY || !appConfigInput.MINIO_SECRET_KEY) { ... }
 
     setIsLoading(true);
     try {
       // 1. Save the entire configuration object
-      // Use type assertion for ddClient here
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (ddClient as any).extension.settings.set(APP_CONFIG_STORAGE_KEY, appConfigInput);
+      // Use the correct API path
+      await ddClient.desktopUI.settings.set(APP_CONFIG_STORAGE_KEY, appConfigInput);
       setPrimaryKeyLoaded(!!appConfigInput.OPENROUTER_API_KEY);
       setSnackbarState({ open: true, message: 'Configuration saved. Restarting services...', severity: 'success' });
 
@@ -197,7 +186,7 @@ export function App() {
       setIsModalOpen(false);
       setSnackbarState({
         open: true,
-        message: 'Open WebUI & MinIO restarted successfully with the updated configuration.',
+        message: 'Open WebUI restarted successfully with the updated configuration.',
         severity: 'success',
       });
 
@@ -280,27 +269,30 @@ export function App() {
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
             {primaryKeyLoaded
-              ? 'Update API keys and MinIO settings below. Services will restart upon saving.'
-              : 'OpenRouter API Key is required. Fill in other API keys and MinIO settings as needed.'}
+              ? 'Update API keys below. Services will restart upon saving.'
+              : 'OpenRouter API Key is required. Fill in other API keys as needed.'}
           </DialogContentText>
           <Grid container spacing={2}>
             {Object.keys(appConfigInput).map((key) => (
               <Grid item xs={12} sm={6} key={key}>
+                <Typography variant="caption" display="block" gutterBottom sx={{ mb: 0.5, fontWeight: 'medium' }}>
+                  {formatLabel(key)}{key === 'OPENROUTER_API_KEY' ? ' *' : ''}
+                </Typography>
                 <TextField
                   margin="dense"
                   id={key}
                   name={key}
-                  label={formatLabel(key)}
+                  // Remove the label prop
+                  // label={formatLabel(key)}
                   // Determine type based on key name convention
                   type={key.toLowerCase().includes('secret') || key.toLowerCase().includes('key') ? 'password' : 'text'}
                   fullWidth
-                  variant="standard"
+                  variant="outlined" // Changed variant for better visual structure without label
+                  size="small" // Use small size for dense layout
                   value={appConfigInput[key as keyof AppConfig]}
                   onChange={handleConfigInputChange}
                   disabled={isLoading}
                   required={key === 'OPENROUTER_API_KEY'}
-                  // Add specific required fields for MinIO if desired
-                  // required={key === 'OPENROUTER_API_KEY' || key === 'MINIO_ACCESS_KEY' || key === 'MINIO_SECRET_KEY'}
                 />
               </Grid>
             ))}
