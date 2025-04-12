@@ -2,6 +2,7 @@ services:
 
   docker-desktop-open-webui:
     image: ${DESKTOP_PLUGIN_IMAGE}
+
   searxng:
     container_name: searxng
     hostname: searxng
@@ -16,16 +17,28 @@ services:
   
   
   open-webui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:cuda
     container_name: open-webui
     hostname: open-webui
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     depends_on:
       - ollama
+      - minio
+      - tika
+      - redis-ws
+      - redis
     ports:
       - "11500:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:
+      - USE_CUDA_DOCKER=True
       - WEBUI_AUTH=False
       - WEBUI_SESSION_COOKIE_SAME_SITE=None
       - WEBUI_SESSION_COOKIE_SECURE=True
@@ -35,23 +48,25 @@ services:
       - DEFAULT_MODELS=tinyllama
       - SEARXNG_QUERY_URL=http://host.docker.internal:11505
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - RAG_OLLAMA_BASE_URL=http://host.docker.internal:11434
       # - ENV=dev
-      # - ENABLE_PERSISTENT_CONFIG=True
+      - ENABLE_PERSISTENT_CONFIG=True
+      - ENABLE_TAGS_GENERATION=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
       - WEBUI_URL=http://localhost:11500
       # - ENABLE_SIGNUP=True
       # - ENABLE_LOGIN_FORM=True
-      # - ENABLE_REALTIME_CHAT_SAVE=False
+      - ENABLE_REALTIME_CHAT_SAVE=True
       # - ENABLE_ADMIN_EXPORT=True
       # - ENABLE_ADMIN_CHAT_ACCESS=True
-      # - ENABLE_CHANNELS=False
+      - ENABLE_CHANNELS=True
       # - ADMIN_EMAIL=""
       # - SHOW_ADMIN_DETAILS=True
       # - BYPASS_MODEL_ACCESS_CONTROL=False
       # - DEFAULT_USER_ROLE=pending
       - DEFAULT_LOCALE=fr
-      # - WEBHOOK_URL=""
+      - WEBHOOK_URL="http://localhost:11500/api/webhook"
       # - WEBUI_BUILD_HASH=dev-build
       # - AIOHTTP_CLIENT_TOTAL_CONN=100
       # - AIOHTTP_CLIENT_MAX_SIZE_CONN=10
@@ -69,16 +84,16 @@ services:
       # - OLLAMA_NUM_PARALLEL=1
       # - OLLAMA_MAX_QUEUE=100
       # - ENABLE_OLLAMA_MULTIMODAL_SUPPORT=False
-      # - OPENAI_API_BASE_URL=""
-      # - OPENAI_API_KEY=""
-      # - ENABLE_OPENAI_API_KEY=False
+      - OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
+      - OPENAI_API_KEY="${OPENROUTER_API_KEY}"
+      - ENABLE_OPENAI_API_KEY=True
       # - ENABLE_OPENAI_API_BROWSER_EXTENSION_ACCESS=False
       # - OPENAI_API_KEY_GENERATION_ENABLED=False
       # - OPENAI_API_KEY_GENERATION_ROLE=user
       # - OPENAI_API_KEY_EXPIRATION_TIME_IN_MINUTES=0
       # - TASKS_MAX_RETRIES=3
       # - TASKS_RETRY_DELAY=60
-      # - ENABLE_AUTOCOMPLETE=False
+      - ENABLE_AUTOCOMPLETE_GENERATION=True
       # - AUTOCOMPLETE_PROVIDER=ollama
       # - AUTOCOMPLETE_MODEL=""
       # - AUTOCOMPLETE_NO_STREAM=True
@@ -89,14 +104,14 @@ services:
       # - EVALUATION_ARENA_MODELS_TAGS_GENERATION_PROMPT_MIN_LENGTH=100
       # - API_KEYS_ENDPOINT_ACCESS_NONE=True
       # - API_KEYS_ENDPOINT_ACCESS_ALL=False
-      # - ENABLE_RAG=True
+      - ENABLE_RAG=True
       # - RAG_EMBEDDING_ENGINE=ollama
-      # - RAG_EMBEDDING_MODEL=""
-      # - RAG_EMBEDDING_MODEL_AUTOUPDATE=True
+      # - RAG_EMBEDDING_MODEL="nomic-embed-text"
+      - RAG_EMBEDDING_MODEL_AUTOUPDATE=True
       # - RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE=False
-      # - RAG_EMBEDDING_OPENAI_API_BASE_URL=""
-      # - RAG_EMBEDDING_OPENAI_API_KEY=""
-      # - RAG_RERANKING_MODEL=""
+      # - RAG_EMBEDDING_OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
+      # - RAG_EMBEDDING_OPENAI_API_KEY="${OPENROUTER_API_KEY}"
+      # - RAG_RERANKING_MODEL="nomic-embed-text"
       # - RAG_RERANKING_MODEL_AUTOUPDATE=True
       # - RAG_RERANKING_MODEL_TRUST_REMOTE_CODE=False
       # - RAG_RERANKING_TOP_K=3
@@ -104,45 +119,60 @@ services:
       # - RAG_CHUNK_SIZE=1500
       # - RAG_CHUNK_OVERLAP=100
       # - RAG_NUM_SOURCES=4
-      # - RAG_OPENAI_API_KEY=""
-      # - RAG_PDF_EXTRACTION_LIBRARY=pypdf
+      - RAG_OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
+      - RAG_OPENAI_API_KEY="${OPENROUTER_API_KEY}"
+      - RAG_PDF_EXTRACTION_LIBRARY=pypdf
+      - PDF_EXTRACT_IMAGES=True
       # - RAG_COPY_UPLOADED_FILES_TO_VOLUME=False
       # - RAG_WEB_SEARCH_LLM_TIMEOUT=120
       # - RAG_WEB_SEARCH_RESULT_COUNT=3
       # - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
       # - RAG_WEB_SEARCH_BACKEND_TIMEOUT=120
-      # - RAG_BRAVE_SEARCH_API_KEY=""
-      # - RAG_GOOGLE_SEARCH_API_KEY=""
-      # - RAG_GOOGLE_SEARCH_ENGINE_ID=""
-      # - RAG_SERPER_API_KEY=""
-      # - RAG_SERPAPI_API_KEY=""
-      # - RAG_DUCKDUCKGO_SEARCH_ENABLED=True
-      # - RAG_SEARCHAPI_API_KEY=""
+      - RAG_BRAVE_SEARCH_API_KEY="${BRAVE_SEARCH_API_KEY}"
+      - RAG_GOOGLE_SEARCH_API_KEY="${GOOGLE_SEARCH_API_KEY}"
+      - RAG_GOOGLE_SEARCH_ENGINE_ID="${GOOGLE_SEARCH_ENGINE_ID}"
+      - RAG_SERPER_API_KEY="${SERPER_API_KEY}"
+      - RAG_SERPAPI_API_KEY="${SERPAPI_API_KEY}"
+      - RAG_DUCKDUCKGO_SEARCH_ENABLED=True
+      - RAG_SEARCHAPI_API_KEY="${SEARCHAPI_API_KEY}"
       # - RAG_WEB_LOADER_URL_BLACKLIST=""
       # - RAG_WEB_LOADER_CONTINUE_ON_FAILURE=False
-      # - RAG_WEB_LOADER_MODE=html2text
-      # - RAG_WEB_LOADER_SSL_VERIFICATION=True
-      # - RAG_YOUTUBE_LOADER_LANGUAGE=en
-      # - RAG_YOUTUBE_LOADER_TRANSLATION=fr
-      # - RAG_YOUTUBE_LOADER_ADD_VIDEO_INFO=False
-      # - RAG_YOUTUBE_LOADER_CONTINUE_ON_FAILURE=False
-      # - WHISPER_MODEL=small-fr
-      # - WHISPER_MODEL_AUTOUPDATE=True
+      - RAG_WEB_LOADER_MODE=html2text
+      - RAG_WEB_LOADER_SSL_VERIFICATION=True
+      - RAG_YOUTUBE_LOADER_LANGUAGE=fr
+      - RAG_YOUTUBE_LOADER_TRANSLATION=fr
+      - RAG_YOUTUBE_LOADER_ADD_VIDEO_INFO=True
+      - RAG_YOUTUBE_LOADER_CONTINUE_ON_FAILURE=False
+      - WHISPER_MODEL=base
+      - WHISPER_MODEL_AUTOUPDATE=True
       # - WHISPER_MODEL_TRUST_REMOTE_CODE=False
-      # - WHISPER_DEVICE=cpu
-      # - STT_ENGINE=""
-      # - STT_OPENAI_API_BASE_URL=""
-      # - STT_OPENAI_API_KEY=""
-      # - TTS_ENGINE=""
-      # - AZURE_TTS_KEY=""
-      # - AZURE_TTS_REGION=""
-      # - OPENAI_TTS_API_BASE_URL=""
-      # - OPENAI_TTS_API_KEY=""
-      # - IMAGE_GENERATION_ENGINE=""
+      # - WHISPER_DEVICE=cuda
+      - AUDIO_STT_MODEL="whisper-1"
+      - AUDIO_STT_ENGINE="openai"
+      - AUDIO_STT_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
+      - AUDIO_STT_OPENAI_API_KEY="${OPENAI_API_KEY}"
+      - AZURE_TTS_KEY="${AZURE_TTS_KEY}"
+      - AZURE_TTS_REGION="${AZURE_TTS_REGION}"
+      - AUDIO_TTS_MODEL="tts-1"
+      - AUDIO_TTS_ENGINE="openai"
+      - AUDIO_TTS_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
+      - AUDIO_TTS_OPENAI_API_KEY="${OPENAI_API_KEY}"
+      - ENABLE_IMAGE_GENERATION=True
+      - IMAGE_GENERATION_ENGINE="openai"
+      - IMAGE_GENERATION_MODEL="gpt-4o"
+      - IMAGES_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
+      - IMAGES_OPENAI_API_KEY="${OPENAI_API_KEY}"
       # - AUTOMATIC1111_BASE_URL=""
       # - COMFYUI_BASE_URL=""
-      # - OPENAI_DALLE_API_BASE_URL=""
-      # - OPENAI_DALLE_API_KEY=""
+      # - OPENAI_DALLE_API_BASE_URL="https://api.openai.com/v1/" # Covered by IMAGES_OPENAI_API_BASE_URL
+      # - OPENAI_DALLE_API_KEY="${OPENAI_API_KEY}" # Covered by IMAGES_OPENAI_API_KEY
+      # S3 Configuration (MinIO)
+      - STORAGE_PROVIDER=s3
+      - S3_ACCESS_KEY_ID="${MINIO_ACCESS_KEY}"
+      - S3_SECRET_ACCESS_KEY="${MINIO_SECRET_KEY}"
+      - S3_BUCKET_NAME="${MINIO_BUCKET_NAME:-open-webui-data}" # Default bucket name if not provided
+      - S3_ENDPOINT_URL=http://minio:9000 # Internal endpoint for service communication
+      - S3_REGION_NAME=us-east-1 # Common default for MinIO
       # - ENABLE_OAUTH_LOGIN=False
       # - ENABLE_OAUTH_SIGNUP=False
       # - OAUTH_METADATA_URL=""
@@ -187,12 +217,12 @@ services:
       # - DATABASE_POOL_MAX_OVERFLOW=0
       # - DATABASE_POOL_TIMEOUT=30
       # - DATABASE_POOL_RECYCLE=3600
-      # - REDIS_URL=""
+      - REDIS_URL="http://host.docker.internal:11558"
       # - REDIS_SENTINEL_HOSTS=""
       # - REDIS_SENTINEL_PORT=26379
-      # - ENABLE_WEBSOCKET_SUPPORT=False
-      # - WEBSOCKET_MANAGER=redis
-      # - WEBSOCKET_REDIS_URL=""
+      - ENABLE_WEBSOCKET_SUPPORT=True
+      - WEBSOCKET_MANAGER=redis
+      - WEBSOCKET_REDIS_URL="http://host.docker.internal:11559"
       # - WEBSOCKET_SENTINEL_HOSTS=""
       # - WEBSOCKET_SENTINEL_PORT=26379
       # - UVICORN_WORKERS=1
@@ -201,6 +231,7 @@ services:
       # - no_proxy=""
       # - PIP_OPTIONS=""
       # - PIP_PACKAGE_INDEX_OPTIONS=""
+      - TIKA_SERVER_URL="http://host.docker.internal:11560"
     restart: always
 
   docling-serve:
@@ -234,6 +265,22 @@ services:
       - JUPYTER_TOKEN=123456
     restart: always
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    hostname: minio
+    ports:
+      - "11556:9001" # API/Console Port
+      - "11557:9000" # S3 Endpoint Port
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin} # Use provided key or default
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin} # Use provided secret or default
+      MINIO_SERVER_URL: http://localhost:9001 # For console access
+    command: server /data --console-address ":9001"
+    restart: always
+
   ollama:
     image: ollama/ollama
     container_name: ollama
@@ -250,9 +297,42 @@ services:
     volumes:
       - ollama:/root/.ollama
     restart: always
+  
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    ports:
+      - "11558:6379"
+    volumes:
+      - redis:/data
+    restart: always
+
+  redis-ws:
+    image: redis:latest
+    container_name: redis-ws
+    hostname: redis-ws
+    ports:
+      - "11559:6379"
+    volumes:
+      - redis-ws:/data
+    restart: always
+
+  tika:
+    image: apache/tika:latest
+    container_name: tika
+    hostname: tika
+    ports:
+      - "11560:9998"
+    restart: always
 
 volumes:
   open-webui:
   ollama:
   jupyter:
-
+  redis:
+  redis-ws:
+  tika:
+  minio_data:
+  openai-edge-tts:
+  docling-serve:
