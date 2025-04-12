@@ -18,7 +18,8 @@ jobs:
           refs/heads/main)
             echo "$prefix:latest" >> "$GITHUB_OUTPUT";;
           refs/tags/v[0-9]*)
-            echo "$prefix:${ref#refs/tags/}" >> "$GITHUB_OUTPUT";;
+            echo "$prefix:${ref#refs/tags/}" >> "$GITHUB_OUTPUT"
+            echo "$prefix:latest" >> "$GITHUB_OUTPUT";;
           *)
             echo "$prefix:${{ github.sha }}" >> "$GITHUB_OUTPUT";;
         esac
@@ -55,13 +56,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - uses: docker/build-push-action@v6
-      with:
-        platforms: |
-          linux/amd64
-          linux/arm64
-        push: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') }}
-        tags: ${{ steps.tags.outputs.TAGS }}
-    - uses: docker/build-push-action@v6
       name: Build and push searxng image
       with:
         context: .
@@ -71,3 +65,14 @@ jobs:
           linux/arm64
         push: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') }}
         tags: ${{ steps.searxng_tags.outputs.TAGS }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    - uses: docker/build-push-action@v6
+      with:
+        platforms: |
+          linux/amd64
+          linux/arm64
+        push: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') }}
+        tags: ${{ steps.tags.outputs.TAGS }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
