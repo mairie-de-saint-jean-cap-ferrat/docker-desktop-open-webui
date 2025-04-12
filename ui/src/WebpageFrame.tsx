@@ -16,7 +16,7 @@ const WebpageFrame = () => {
     <>
       {hideIframeView && <LoadingView />}
       <iframe
-        src="http://localhost:11500"
+        src="http://host.docker.internal:11500"
         style={{
           position: 'absolute',
           left: '0',
