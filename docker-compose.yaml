@@ -327,6 +327,13 @@ services:
       - "11560:9998"
     restart: always
 
+  MCP_DOCKER:
+    image: alpine/socat
+    command: socat STDIO TCP:host.docker.internal:8811
+    stdin_open: true # equivalent of -i
+    tty: true        # equivalent of -t (often needed with -i)
+    # --rm is handled by compose up/down lifecycle
+
 volumes:
   backend-data: {}
   open-webui:
