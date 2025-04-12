@@ -1,7 +1,10 @@
 {
   "icon": "yo-ai-lab.png",
   "vm": {
-    "composefile": "docker-compose.yaml"
+    "composefile": "docker-compose.yaml",
+    "exposes": {
+      "socket": "backend.sock"
+    }
   },
   "ui": {
     "dashboard-tab": {

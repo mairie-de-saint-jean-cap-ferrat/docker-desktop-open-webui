@@ -1,4 +1,4 @@
-IMAGE?=docker-sandbox/rd-open-webui-ext
+IMAGE?=ghcr.io/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui
 TAG?=latest
 
 BUILDER=buildx-multi-arch
@@ -7,7 +7,7 @@ INFO_COLOR = \033[0;36m
 NO_COLOR   = \033[m
 
 build-extension: ## Build service image to be deployed as a desktop extension
-	docker build --platform linux/amd64,linux/arm64 --tag=$(IMAGE):$(TAG) .
+	docker build --tag=$(IMAGE):$(TAG) .
 
 install-extension: build-extension ## Install the extension
 	docker extension install $(IMAGE):$(TAG)

@@ -4,21 +4,15 @@ ENV CGO_ENABLED=0
 RUN apk update && \
     apk add --no-cache curl unzip
 
-WORKDIR /installer
-COPY installer/go.* .
+WORKDIR /backend
+COPY backend/go.* .
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go mod download
-COPY installer/. .
+COPY backend/. .
 RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    GOOS=linux go build -trimpath -ldflags="-s -w" -o bin/installer-linux
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    GOOS=darwin go build -trimpath -ldflags="-s -w" -o bin/installer-darwin
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    GOOS=windows go build -trimpath -ldflags="-s -w" -o bin/installer-windows.exe
+        --mount=type=cache,target=/root/.cache/go-build \
+        go build -trimpath -ldflags="-s -w" -o bin/service
 
 FROM --platform=$BUILDPLATFORM node:21.6-alpine3.18 AS client-builder
 WORKDIR /ui
@@ -49,7 +43,7 @@ LABEL org.opencontainers.image.title="y0n1x's AI Lab" \
 COPY docker-compose.yaml .
 COPY Dockerfile.searxng .
 COPY metadata.json .
-COPY yo-ai-lab.png .
+COPY open-webui.svg .
 COPY --from=client-builder /ui/build ui
 # Copier seulement le binaire Go modifié
 COPY --from=builder /installer/bin/installer-linux /linux/installer
@@ -59,3 +53,5 @@ COPY --from=builder /installer/bin/installer-windows.exe /windows/installer.exe
 COPY /searxng/limiter.toml /linux/searxng/limiter.toml
 COPY /searxng/settings.yml /linux/searxng/settings.yml
 COPY /searxng/uwsgi.ini /linux/searxng/uwsgi.ini
+
+CMD /service -socket /run/guest-services/backend.sock
