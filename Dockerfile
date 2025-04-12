@@ -48,4 +48,4 @@ COPY --from=client-builder /ui/build ui
 # Copier le binaire Go
 COPY --from=builder /backend/bin/service /service
 
-CMD /service -socket /run/guest-services/backend.sock
+CMD ["/service", "-socket", "/run/guest-services/backend.sock"]
