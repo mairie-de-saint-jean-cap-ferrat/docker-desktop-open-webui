@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"runtime"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -86,6 +87,15 @@ func saveConfig(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "Configuration saved successfully"})
 }
 
+func getSocketPath() string {
+	if runtime.GOOS == "windows" {
+		// Windows named pipe format
+		return `\\.\pipe\dockerExtensions-ghcr.io_mairie-de-saint-jean-cap-ferrat_docker-desktop-open-webui-backend`
+	}
+	// Unix socket - Docker Desktop will handle the actual socket path
+	return ":8080"
+}
+
 func main() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(logrus.InfoLevel)
@@ -97,7 +107,7 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost}, // Only GET and POST needed for config
+		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
 
 	// Serve static "Hello World" on root, just for basic check
@@ -110,10 +120,10 @@ func main() {
 	e.GET("/api/config", getConfig)
 	e.POST("/api/config", saveConfig)
 
-	log.Info("Starting server on internal port 8080 (via socket)...")
-	// Docker Desktop manages the socket connection based on metadata.json
-	// The internal listener can be on a standard port like 8080
-	if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+	socketPath := getSocketPath()
+	log.Infof("Starting server on %s...", socketPath)
+
+	if err := e.Start(socketPath); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("shutting down the server: %v", err)
 	}
 }

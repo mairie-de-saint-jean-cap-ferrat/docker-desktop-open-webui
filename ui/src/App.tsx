@@ -52,9 +52,6 @@ const defaultConfig: AppConfig = {
   SEARCHAPI_API_KEY: '',
 };
 
-// Key for storing the entire configuration object
-const APP_CONFIG_STORAGE_KEY = 'appConfig';
-
 // Helper to create labels from key names
 const formatLabel = (key: string): string => {
   return key

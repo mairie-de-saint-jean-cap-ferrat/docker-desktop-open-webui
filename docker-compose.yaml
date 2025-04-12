@@ -3,7 +3,8 @@ services:
   docker-desktop-open-webui:
     image: ${DESKTOP_PLUGIN_IMAGE}
     volumes:
-          - backend-data:/data
+      - backend-data:/data
+      - /var/run/docker.sock.raw:/var/run/docker.sock
 
   searxng:
     container_name: searxng
