@@ -10,8 +10,8 @@ const ToastNotification = () => {
     const NOTIFICATION_DELAY_MS = 5000; 
     const TWO_WEEKS_MS = 2 * 7 * 24 * 60 * 60 * 1000;
     const FIRST_LAUNCH_KEY = 'firstLaunchTimeStamp';
-    const DONT_SHOW_AGAIN_KEY = 'dontShowSUSEAIAdvertisement';
-    const SUSE_AI_URL = 'https://www.suse.com/products/ai/';
+    const DONT_SHOW_AGAIN_KEY = 'dontShowYonixAIAdvertisement';
+    const YONIX_AI_URL = 'https://maytech06.com';
     const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     const handleDontShowAgain = (toastId: string | number) => {
@@ -21,7 +21,7 @@ const ToastNotification = () => {
 
     const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
-        ddClient.host.openExternal(SUSE_AI_URL);
+        ddClient.host.openExternal(YONIX_AI_URL);
     };
 
     const shouldShowNotification = () => {
@@ -55,7 +55,7 @@ const ToastNotification = () => {
                         onClick={handleLinkClick}
                         className="suse-link"
                     >
-                        SUSE AI
+                        Yonix AI
                     </a>
                     !
                 </p>

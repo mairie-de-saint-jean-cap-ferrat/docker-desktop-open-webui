@@ -37,7 +37,7 @@ services:
       # - ENABLE_PERSISTENT_CONFIG=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
-      - WEBUI_URL=http://0.0.0.0:11500
+      - WEBUI_URL=http://localhost:11500
       # - ENABLE_SIGNUP=True
       # - ENABLE_LOGIN_FORM=True
       # - ENABLE_REALTIME_CHAT_SAVE=False
@@ -48,7 +48,7 @@ services:
       # - SHOW_ADMIN_DETAILS=True
       # - BYPASS_MODEL_ACCESS_CONTROL=False
       # - DEFAULT_USER_ROLE=pending
-      # - DEFAULT_LOCALE=fr
+      - DEFAULT_LOCALE=fr
       # - WEBHOOK_URL=""
       # - WEBUI_BUILD_HASH=dev-build
       # - AIOHTTP_CLIENT_TOTAL_CONN=100
