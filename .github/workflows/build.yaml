@@ -68,6 +68,7 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
     - uses: docker/build-push-action@v6
+      name: Build and push ui image
       with:
         platforms: |
           linux/amd64
