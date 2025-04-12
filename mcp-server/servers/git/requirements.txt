@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+
+pytz
+python-dateutil

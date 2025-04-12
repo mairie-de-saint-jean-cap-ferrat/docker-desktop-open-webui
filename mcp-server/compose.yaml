@@ -1,0 +1,21 @@
+services:
+  filesystem-server:
+    build:
+      context: ./servers/filesystem
+    ports:
+      - 8081:8000
+  memory-server:
+    build:
+      context: ./servers/memory
+    ports:
+      - 8082:8000
+    volumes:
+      - memory:/app/data:rw
+  time-server:
+    build:
+      context: ./servers/time
+    ports:
+      - 8083:8000
+
+volumes:
+  memory:

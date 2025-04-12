@@ -6,4 +6,18 @@
     "eslint.problems.shortenToSingleLine": true,
     "eslint.run": "onSave",
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "files.exclude": {
+        "**/.git": false,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.trunk/*actions/": true,
+        "**/.trunk/*logs/": true,
+        "**/.trunk/*notifications/": true,
+        "**/.trunk/*out/": true,
+        "**/.trunk/*plugins/": true
+    },
+    "explorerExclude.backup": {},
 }

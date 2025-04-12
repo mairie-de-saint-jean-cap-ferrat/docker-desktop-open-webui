@@ -334,6 +334,24 @@ services:
     tty: true        # equivalent of -t (often needed with -i)
     # --rm is handled by compose up/down lifecycle
 
+  filesystem-server:
+    build:
+      context: mcp-server/servers/filesystem
+    ports:
+      - 8081:8000
+  memory-server:
+    build:
+      context: mcp-server/servers/memory
+    ports:
+      - 8082:8000
+    volumes:
+      - memory:/app/data:rw
+  time-server:
+    build:
+      context: mcp-server/servers/time
+    ports:
+      - 8083:8000
+
 volumes:
   backend-data: {}
   open-webui:
@@ -345,3 +363,7 @@ volumes:
   minio_data:
   openai-edge-tts:
   docling-serve:
+  memory:
+
+
+
