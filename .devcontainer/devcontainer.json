@@ -20,7 +20,6 @@
 		"ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {},
 		"ghcr.io/audacioustux/devcontainers/common-utils-extras:1": {},
 		"ghcr.io/goldsam/dev-container-features/cue-lang:1": {},
-		"ghcr.io/devcontainers-extra/features/actions-runner:1": {},
 		"ghcr.io/devcontainers-extra/features/cmake:1": {},
 		"ghcr.io/devcontainers-extra/features/gitomatic:1": {},
 		"ghcr.io/devcontainers-extra/features/gitsign-credential-cache:1": {},
