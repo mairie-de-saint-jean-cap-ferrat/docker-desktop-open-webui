@@ -18,10 +18,10 @@ import {
 } from '@mui/material';
 
 // Initialize Docker Desktop client
-const client = createDockerDesktopClient();
+const ddClient = createDockerDesktopClient();
 
 function useDockerDesktopClient() {
-  return client;
+  return ddClient;
 }
 
 // Updated Interface for the structure of stored API keys & config
