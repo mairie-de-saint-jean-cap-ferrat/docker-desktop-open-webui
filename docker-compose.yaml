@@ -5,6 +5,8 @@ services:
     volumes:
       - backend-data:/data
       - /var/run/docker.sock.raw:/var/run/docker.sock
+    expose:
+      - backend.sock
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:cuda

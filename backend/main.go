@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
 	"os"
-	"runtime"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -87,43 +87,64 @@ func saveConfig(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "Configuration saved successfully"})
 }
 
-func getSocketPath() string {
-	if runtime.GOOS == "windows" {
-		// Windows named pipe format
-		return `\\.\pipe\dockerExtensions-ghcr.io_mairie-de-saint-jean-cap-ferrat_docker-desktop-open-webui-backend`
-	}
-	// Unix socket - Docker Desktop will handle the actual socket path
-	return ":8080"
+// Simple root handler (Keep or modify as needed)
+func rootHandler(c echo.Context) error {
+	log.Info("Received request for GET /")
+	return c.String(http.StatusOK, "Backend service is running via Unix socket.")
 }
 
 func main() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(logrus.InfoLevel)
 
-	log.Info("Starting backend service...")
+	// Define the standard socket path provided by Docker Desktop based on metadata.json
+	socketPath := "/run/guest-services/backend.sock" // Matches "socket": "backend.sock" in metadata.json
 
-	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost},
-	}))
+	// Remove the socket file if it already exists to avoid bind errors on restart
+	if _, err := os.Stat(socketPath); err == nil {
+		log.Warnf("Removing existing socket file: %s", socketPath)
+		if err := os.Remove(socketPath); err != nil {
+			log.Fatalf("Failed to remove existing socket file %s: %v", socketPath, err)
+		}
+	}
 
-	// Serve static "Hello World" on root, just for basic check
-	e.GET("/", func(c echo.Context) error {
-		log.Info("Received request for GET /")
-		return c.String(http.StatusOK, "Backend service is running.")
-	})
+	log.Infof("Starting backend service, attempting to listen on Unix socket: %s", socketPath)
 
-	// Add configuration endpoints
-	e.GET("/api/config", getConfig)
-	e.POST("/api/config", saveConfig)
+	// Create the Echo instance
+	router := echo.New()
+	router.HideBanner = true // Optional: hide Echo framework banner
 
-	socketPath := getSocketPath()
-	log.Infof("Starting server on %s...", socketPath)
+	// Add middleware (optional, keep if needed)
+	router.Use(middleware.Logger())
+	router.Use(middleware.Recover())
 
-	if err := e.Start(socketPath); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("shutting down the server: %v", err)
+	// Define routes
+	router.GET("/", rootHandler)
+	router.GET("/api/config", getConfig)
+	router.POST("/api/config", saveConfig)
+
+	// Listen on the Unix socket *exactly* as shown in Docker docs examples
+	ln, err := net.Listen("unix", socketPath)
+	if err != nil {
+		log.Fatalf("Failed to listen on Unix socket %s: %v", socketPath, err)
+	}
+	// No defer ln.Close() needed here, Echo handles closing the listener
+
+	// Set permissions AFTER successful listen, before starting server
+	// Using 0777 for broad compatibility within the VM context, adjust if specific permissions are needed.
+	if err := os.Chmod(socketPath, 0777); err != nil {
+		ln.Close() // Clean up listener if chmod fails
+		log.Fatalf("Failed to set permissions on socket file %s: %v", socketPath, err)
+	}
+
+	log.Infof("Successfully listening on Unix socket: %s", socketPath)
+
+	// Tell Echo to use the Unix socket listener instead of TCP
+	router.Listener = ln
+
+	// Start the server. The address string is ignored when Listener is set.
+	if err := router.Start(""); err != nil && err != http.ErrServerClosed {
+		ln.Close() // Ensure listener is closed on fatal error during startup
+		log.Fatalf("Shutting down the server: %v", err)
 	}
 }
