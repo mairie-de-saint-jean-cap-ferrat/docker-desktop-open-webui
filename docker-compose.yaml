@@ -5,6 +5,7 @@ services:
     volumes:
       - backend-data:/data
       - /var/run/docker.sock.raw:/var/run/docker.sock
+      - /run/guest-services/backend.sock:/run/guest-services/backend.sock
     expose:
       - backend.sock
 
@@ -251,7 +252,7 @@ services:
       # - DATABASE_POOL_RECYCLE=3600
 
       # Redis
-      - REDIS_URL="redis://host.docker.internal:11558"
+      # - REDIS_URL="redis://host.docker.internal:11558"
       # - REDIS_SENTINEL_HOSTS=""
       # - REDIS_SENTINEL_PORT=26379
       # - ENABLE_WEBSOCKET_SUPPORT=True
