@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"net"
 	"net/http"
 	"os"
 
@@ -106,14 +105,16 @@ func main() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(logrus.InfoLevel)
 
-
-	// Remove the socket file if it already exists to avoid bind errors on restart
-	if _, err := os.Stat(socketPath); err == nil {
-		log.Warnf("Removing existing socket file: %s", socketPath)
-		if err := os.Remove(socketPath); err != nil {
-			log.Fatalf("Failed to remove existing socket file %s: %v", socketPath, err)
-		}
-	}
+	// Configure structured JSON logging middleware like the template
+	logMiddleware := middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Skipper: middleware.DefaultSkipper,
+		Format: `{"time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}",` +
+			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
+			`"status":${status},"error":"${error}","latency":${latency},"latency_human":"${latency_human}",` +
+			`"bytes_in":${bytes_in},"bytes_out":${bytes_out}}` + "\n",
+		// Use the global logrus logger instance
+		Output: log.Out,
+	})
 
 	log.Infof("Starting backend service, attempting to listen on Unix socket: %s", socketPath)
 
@@ -121,8 +122,8 @@ func main() {
 	router := echo.New()
 	router.HideBanner = true // Optional: hide Echo framework banner
 
-	// Add middleware (optional, keep if needed)
-	router.Use(middleware.Logger())
+	// Add middleware
+	router.Use(logMiddleware) // Use the configured JSON logger
 	router.Use(middleware.Recover())
 
 	// Define routes
@@ -130,19 +131,12 @@ func main() {
 	router.GET("/api/config", getConfig)
 	router.POST("/api/config", saveConfig)
 
-	// Listen on the Unix socket *exactly* as shown in Docker docs examples
-	ln, err := net.Listen("unix", socketPath)
+	// Listen on the Unix socket
+	ln, err := listen(socketPath) // Use the platform-specific listen function
 	if err != nil {
 		log.Fatalf("Failed to listen on Unix socket %s: %v", socketPath, err)
 	}
 	// No defer ln.Close() needed here, Echo handles closing the listener
-
-	// Set permissions AFTER successful listen, before starting server
-	// Using 0777 for broad compatibility within the VM context, adjust if specific permissions are needed.
-	if err := os.Chmod(socketPath, 0777); err != nil {
-		ln.Close() // Clean up listener if chmod fails
-		log.Fatalf("Failed to set permissions on socket file %s: %v", socketPath, err)
-	}
 
 	log.Infof("Successfully listening on Unix socket: %s", socketPath)
 

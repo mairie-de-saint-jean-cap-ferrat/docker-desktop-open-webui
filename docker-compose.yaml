@@ -7,7 +7,7 @@ services:
       - /var/run/docker.sock.raw:/var/run/docker.sock
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:cuda
+    image: ghcr.io/open-webui/open-webui:git-85ef912-cuda
     container_name: open-webui
     hostname: open-webui
     deploy:
@@ -77,7 +77,7 @@ services:
 
       # OpenAI
       - OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
-      - OPENAI_API_KEY="${OPENROUTER_API_KEY}"
+      - OPENAI_API_KEY=${OPENROUTER_API_KEY}
       - ENABLE_OPENAI_API_KEY=True
       # - ENABLE_OPENAI_API_BROWSER_EXTENSION_ACCESS=False
       # - OPENAI_API_KEY_GENERATION_ENABLED=False
@@ -116,7 +116,7 @@ services:
       # - RAG_EMBEDDING_MODEL_AUTOUPDATE=True
       # - RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE=False
       # - RAG_EMBEDDING_OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
-      # - RAG_EMBEDDING_OPENAI_API_KEY="${OPENROUTER_API_KEY}"
+      # - RAG_EMBEDDING_OPENAI_API_KEY=${OPENROUTER_API_KEY}
       # - RAG_RERANKING_MODEL="nomic-embed-text"
       # - RAG_RERANKING_MODEL_AUTOUPDATE=True
       # - RAG_RERANKING_MODEL_TRUST_REMOTE_CODE=False
@@ -126,8 +126,8 @@ services:
       # - RAG_CHUNK_OVERLAP=100
       # - RAG_NUM_SOURCES=4
       - RAG_OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
-      - RAG_OPENAI_API_KEY="${OPENROUTER_API_KEY}"
-      - RAG_PDF_EXTRACTION_LIBRARY=pypdf
+      - RAG_OPENAI_API_KEY=${OPENROUTER_API_KEY}
+      # - RAG_PDF_EXTRACTION_LIBRARY=pypdf
       - PDF_EXTRACT_IMAGES=True
       - RAG_COPY_UPLOADED_FILES_TO_VOLUME=True
 
@@ -139,13 +139,13 @@ services:
       # - RAG_WEB_SEARCH_RESULT_COUNT=3
       # - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
       # - RAG_WEB_SEARCH_BACKEND_TIMEOUT=120
-      - RAG_BRAVE_SEARCH_API_KEY="${BRAVE_SEARCH_API_KEY}"
-      - RAG_GOOGLE_SEARCH_API_KEY="${GOOGLE_SEARCH_API_KEY}"
-      - RAG_GOOGLE_SEARCH_ENGINE_ID="${GOOGLE_SEARCH_ENGINE_ID}"
-      - RAG_SERPER_API_KEY="${SERPER_API_KEY}"
-      - RAG_SERPAPI_API_KEY="${SERPAPI_API_KEY}"
+      - RAG_BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY}
+      - RAG_GOOGLE_SEARCH_API_KEY=${GOOGLE_SEARCH_API_KEY}
+      - RAG_GOOGLE_SEARCH_ENGINE_ID=${GOOGLE_SEARCH_ENGINE_ID}
+      - RAG_SERPER_API_KEY=${SERPER_API_KEY}
+      - RAG_SERPAPI_API_KEY=${SERPAPI_API_KEY}
       # - RAG_DUCKDUCKGO_SEARCH_ENABLED=True
-      - RAG_SEARCHAPI_API_KEY="${SEARCHAPI_API_KEY}"
+      - RAG_SEARCHAPI_API_KEY=${SEARCHAPI_API_KEY}
 
       # Web Loader
       # - RAG_WEB_LOADER_URL_BLACKLIST=""
@@ -169,22 +169,22 @@ services:
       - AUDIO_STT_MODEL="whisper-1"
       - AUDIO_STT_ENGINE="openai"
       - AUDIO_STT_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
-      - AUDIO_STT_OPENAI_API_KEY="${OPENAI_API_KEY}"
+      - AUDIO_STT_OPENAI_API_KEY=${OPENAI_API_KEY}
 
       # Audio - Text-to-Speech
-      #- AZURE_TTS_KEY="${AZURE_TTS_KEY}"
-      #- AZURE_TTS_REGION="${AZURE_TTS_REGION}"
+      #- AZURE_TTS_KEY=${AZURE_TTS_KEY}
+      #- AZURE_TTS_REGION=${AZURE_TTS_REGION}
       - AUDIO_TTS_MODEL="tts-1"
       - AUDIO_TTS_ENGINE="openai"
       - AUDIO_TTS_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
-      - AUDIO_TTS_OPENAI_API_KEY="${OPENAI_API_KEY}"
+      - AUDIO_TTS_OPENAI_API_KEY=${OPENAI_API_KEY}
 
       # Image Generation
       - ENABLE_IMAGE_GENERATION=True
       - IMAGE_GENERATION_ENGINE="openai"
       - IMAGE_GENERATION_MODEL="gpt-4o"
       - IMAGES_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
-      - IMAGES_OPENAI_API_KEY="${OPENAI_API_KEY}"
+      - IMAGES_OPENAI_API_KEY=${OPENAI_API_KEY}
       # - AUTOMATIC1111_BASE_URL=""
       # - COMFYUI_BASE_URL=""
 
