@@ -7,7 +7,7 @@ services:
       - /var/run/docker.sock.raw:/var/run/docker.sock
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:cuda
+    image: ghcr.io/open-webui/open-webui:dev-cuda
     container_name: open-webui
     hostname: open-webui
     deploy:
@@ -29,7 +29,7 @@ services:
     environment:
       # General
       - USE_CUDA_DOCKER=True
-      # - ENV=dev
+      - ENV=dev
       - ENABLE_PERSISTENT_CONFIG=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
@@ -272,6 +272,7 @@ services:
 
       # Apache Tika
       - TIKA_SERVER_URL=http://host.docker.internal:11560
+      
     restart: always
 
   # LibreTranslate server local
