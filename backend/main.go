@@ -6,9 +6,7 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"runtime"
 
-	"github.com/Microsoft/go-winio"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
@@ -93,26 +91,7 @@ func rootHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "Backend service is running via Unix socket.")
 }
 
-// Listen function for unix socket
-func listen(path string) (net.Listener, error) {
-	if runtime.GOOS == "windows" {
-		// Configuration des named pipes Windows
-		pipeConfig := &winio.PipeConfig{
-			SecurityDescriptor: "", // Utiliser un descripteur vide permet l'accès à tous les utilisateurs
-			MessageMode:        true,
-			InputBufferSize:    65536,
-			OutputBufferSize:   65536,
-		}
-		// Le chemin sur Windows doit commencer par "\\.\pipe\"
-		// Si le chemin n'est pas correctement formaté, on l'adapte
-		if path[0] != '\\' {
-			path = `\\.\pipe\` + path
-		}
-		return winio.ListenPipe(path, pipeConfig)
-	}
-	// Par défaut, utiliser les sockets UNIX pour Linux/macOS
-	return net.Listen("unix", path)
-}
+// listen function is now in platform-specific files (listen_unix.go, listen_windows.go)
 
 func main() {
 	// Utilisation de flag comme dans le template
