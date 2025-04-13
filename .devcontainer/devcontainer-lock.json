@@ -55,11 +55,6 @@
       "resolved": "ghcr.io/devcontainers/features/node@sha256:36c03732c3421f11de7a3eefc7e9a7fb3df123cb2e48b115d61fdfe8994911d9",
       "integrity": "sha256:36c03732c3421f11de7a3eefc7e9a7fb3df123cb2e48b115d61fdfe8994911d9"
     },
-    "ghcr.io/goldsam/dev-container-features/cue-lang:1": {
-      "version": "1.0.0",
-      "resolved": "ghcr.io/goldsam/dev-container-features/cue-lang@sha256:3de3532bc545950695ffb43e7218059cad1c1b54df3a801589bfb876309e5382",
-      "integrity": "sha256:3de3532bc545950695ffb43e7218059cad1c1b54df3a801589bfb876309e5382"
-    },
     "ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {
       "version": "1.0.0",
       "resolved": "ghcr.io/schlich/devcontainer-features/powerlevel10k@sha256:180ed79c78dc4c6b857f2ebaaf2e511601d7ae754cc51ec053561f4b82cec1a9",
