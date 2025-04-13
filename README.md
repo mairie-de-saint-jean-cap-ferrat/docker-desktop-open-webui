@@ -1,5 +1,7 @@
 # Open WebUI Docker Extension Suite
 
+🇫🇷 [Français](./README.md) 🇬🇧 [English](./README.en.md) 🇪🇸 [Español](./README.es.md) 🇷🇺 [Русский](./README.ru.md) 🇨🇿 [Čeština](./README.cz.md) 🇨🇳 [简体中文](./README.zh-CN.md) 🇹🇭 [ภาษาไทย](./README.th.md) 🇸🇦 [العربية](./README.ar.md) 🇵🇹 [Português](./README.pt.md)
+
 ![Yo AI Lab Logo](yo-ai-lab.png)
 
 [![Build](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui/actions/workflows/build.yaml/badge.svg?branch=main&event=release)](https://github.com/mairie-de-saint-jean-cap-ferrat/docker-desktop-open-webui/actions/workflows/build.yaml)
