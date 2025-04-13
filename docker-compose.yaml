@@ -436,16 +436,16 @@ services:
     image: mcp/time
     ports:
       - 11563:8000
-  weather-mcp-tool:
-    build:
-      context: mcp-server/servers/weather
-    ports:
-      - 11564:8000
-  get-user-info-mcp-tool:
-    build:
-      context: mcp-server/servers/get-user-info
-    ports:
-      - 11565:8000
+  # weather-mcp-tool:
+  #   build:
+  #     context: mcp-server/servers/weather
+  #   ports:
+  #     - 11564:8000
+  # get-user-info-mcp-tool:
+  #   build:
+  #     context: mcp-server/servers/get-user-info
+  #   ports:
+  #     - 11565:8000
   fetch-mcp-tool:
     image: mcp/fetch
     ports:
