@@ -7,7 +7,7 @@ services:
       - /var/run/docker.sock.raw:/var/run/docker.sock
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:dev-cuda
+    image: ghcr.io/open-webui/open-webui:cuda
     container_name: open-webui
     hostname: open-webui
     deploy:
@@ -29,7 +29,7 @@ services:
     environment:
       # General
       - USE_CUDA_DOCKER=True
-      - ENV=dev
+      # - ENV=dev
       - ENABLE_PERSISTENT_CONFIG=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
@@ -76,7 +76,7 @@ services:
       # - ENABLE_OLLAMA_MULTIMODAL_SUPPORT=False
 
       # OpenAI
-      - OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
+      - OPENAI_API_BASE_URL=https://openrouter.ai/api/v1/
       - OPENAI_API_KEY=${OPENROUTER_API_KEY}
       - ENABLE_OPENAI_API_KEY=True
       # - ENABLE_OPENAI_API_BROWSER_EXTENSION_ACCESS=False
@@ -125,7 +125,7 @@ services:
       # - RAG_CHUNK_SIZE=1500
       # - RAG_CHUNK_OVERLAP=100
       # - RAG_NUM_SOURCES=4
-      - RAG_OPENAI_API_BASE_URL="https://openrouter.ai/api/v1/"
+      - RAG_OPENAI_API_BASE_URL=https://openrouter.ai/api/v1/
       - RAG_OPENAI_API_KEY=${OPENROUTER_API_KEY}
       # - RAG_PDF_EXTRACTION_LIBRARY=pypdf
       - PDF_EXTRACT_IMAGES=True
@@ -168,7 +168,7 @@ services:
       # Audio - Speech-to-Text
       - AUDIO_STT_MODEL="whisper-1"
       - AUDIO_STT_ENGINE="openai"
-      - AUDIO_STT_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
+      - AUDIO_STT_OPENAI_API_BASE_URL=https://api.openai.com/v1/
       - AUDIO_STT_OPENAI_API_KEY=${OPENAI_API_KEY}
 
       # Audio - Text-to-Speech
@@ -176,14 +176,14 @@ services:
       #- AZURE_TTS_REGION=${AZURE_TTS_REGION}
       - AUDIO_TTS_MODEL="tts-1"
       - AUDIO_TTS_ENGINE="openai"
-      - AUDIO_TTS_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
+      - AUDIO_TTS_OPENAI_API_BASE_URL=https://api.openai.com/v1/
       - AUDIO_TTS_OPENAI_API_KEY=${OPENAI_API_KEY}
 
       # Image Generation
       - ENABLE_IMAGE_GENERATION=True
       - IMAGE_GENERATION_ENGINE="openai"
       - IMAGE_GENERATION_MODEL="gpt-4o"
-      - IMAGES_OPENAI_API_BASE_URL="https://api.openai.com/v1/"
+      - IMAGES_OPENAI_API_BASE_URL=https://api.openai.com/v1/
       - IMAGES_OPENAI_API_KEY=${OPENAI_API_KEY}
       # - AUTOMATIC1111_BASE_URL=""
       # - COMFYUI_BASE_URL=""
@@ -271,7 +271,7 @@ services:
       # - PIP_PACKAGE_INDEX_OPTIONS=""
 
       # Apache Tika
-      - TIKA_SERVER_URL="http://host.docker.internal:11560"
+      - TIKA_SERVER_URL=http://host.docker.internal:11560
     restart: always
 
   # LibreTranslate server local
