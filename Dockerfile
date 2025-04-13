@@ -10,9 +10,14 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go mod download
 COPY backend/. .
+# Create the vendor directory based on go.mod
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod vendor
+
+# Build the backend service, forcing use of the populated vendor directory
 RUN --mount=type=cache,target=/go/pkg/mod \
         --mount=type=cache,target=/root/.cache/go-build \
-        go build -trimpath -ldflags="-s -w" -o bin/service
+        go build -mod=vendor -trimpath -ldflags="-s -w" -o bin/service
 
 FROM --platform=$BUILDPLATFORM node:21.6-alpine3.18 AS client-builder
 WORKDIR /ui
