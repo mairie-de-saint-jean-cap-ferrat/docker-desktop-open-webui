@@ -1,30 +1,24 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/universal
 {
-	"name": "Default Linux Universal",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+	"name": "DDExt-Open-WebUI",
+	"build": { 
+		"context": "..",
+		"dockerfile": "Dockerfile"
+	},
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {},
+		"ghcr.io/audacioustux/devcontainers/common-utils-extras:1": {},
+		"ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/go:1": {},
-		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/devcontainers/features/nvidia-cuda:1": {},
-		"ghcr.io/devcontainers/features/python:1": {},
-		"ghcr.io/rocker-org/devcontainer-features/miniforge:2": {},
-		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
-		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {},
-		"ghcr.io/lentzi90/features/tilt:0": {},
-		"ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {},
-		"ghcr.io/audacioustux/devcontainers/common-utils-extras:1": {},
-		"ghcr.io/goldsam/dev-container-features/cue-lang:1": {},
-		"ghcr.io/devcontainers-extra/features/cmake:1": {},
 		"ghcr.io/devcontainers-extra/features/gitomatic:1": {},
 		"ghcr.io/devcontainers-extra/features/gitsign-credential-cache:1": {},
-		"ghcr.io/devcontainers-extra/features/tailscale:1": {},
-		"ghcr.io/devcontainers-extra/features/typescript:2": {}
+		"ghcr.io/devcontainers/features/go:1": {},
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers-extra/features/typescript:2": {},
+		"ghcr.io/goldsam/dev-container-features/cue-lang:1": {},
+		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {},
+		"ghcr.io/devcontainers-extra/features/tailscale:1": {}
 	},
 	"customizations": {
 		"vscode": {
