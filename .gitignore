@@ -3,3 +3,11 @@ ui/build
 linux
 docker-extension-template
 vendor
+.conda
+.env
+.venv
+.vscode
+.DS_Store
+.idea
+.pytest_cache
+.ruff_cache

@@ -7,7 +7,7 @@ services:
       - /var/run/docker.sock.raw:/var/run/docker.sock
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:git-85ef912-cuda
+    image: ghcr.io/open-webui/open-webui:dev-cuda
     container_name: open-webui
     hostname: open-webui
     deploy:
@@ -29,7 +29,7 @@ services:
     environment:
       # General
       - USE_CUDA_DOCKER=True
-      # - ENV=dev
+      - ENV=dev
       - ENABLE_PERSISTENT_CONFIG=True
       - CUSTOM_NAME="y0n1x's AI Lab"
       - WEBUI_NAME=y0n1x's AI Lab
@@ -189,12 +189,12 @@ services:
       # - COMFYUI_BASE_URL=""
 
       # Storage - S3 (MinIO)
-      - STORAGE_PROVIDER=s3
-      - S3_ACCESS_KEY_ID=minioadmin
-      - S3_SECRET_ACCESS_KEY=minioadmin
-      - S3_BUCKET_NAME="open-webui-data"
-      - S3_ENDPOINT_URL=http://host.docker.internal:11557
-      - S3_REGION_NAME=us-east-1
+      # - STORAGE_PROVIDER=s3
+      # - S3_ACCESS_KEY_ID=minioadmin
+      # - S3_SECRET_ACCESS_KEY=minioadmin
+      # - S3_BUCKET_NAME="open-webui-data"
+      # - S3_ENDPOINT_URL=http://host.docker.internal:11557
+      # - S3_REGION_NAME=us-east-1
 
       # OAuth
       # - ENABLE_OAUTH_LOGIN=False
@@ -283,13 +283,13 @@ services:
       - "11553:5000"
     environment:
       - LT_DEBUG="false"
-      - LT_UPDATE_MODELS="true"
+      - LT_UPDATE_MODELS="false"
       - LT_SSL="false"
       - LT_SUGGESTIONS="false"
       - LT_METRICS="false"
       - LT_HOST="0.0.0.0"
       - LT_API_KEYS="false"
-      - LT_THREADS="12"
+      - LT_THREADS="6"
       - LT_FRONTEND_TIMEOUT="2000"
     volumes:
       - libretranslate_api_keys:/app/db
