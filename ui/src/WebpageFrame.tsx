@@ -1,20 +1,21 @@
 import React from 'react'
 
-const WebpageFrame = () => {
+interface WebpageFrameProps {
+  src: string;
+}
+
+const WebpageFrame: React.FC<WebpageFrameProps> = ({ src }) => {
   return (
-    <>
-      <iframe
-        src="http://host.docker.internal:11500"
-        style={{
-          position: 'absolute',
-          left: '0',
-          top: '0',
-          width: '100%',
-          height: '100%',
-          border: 'none',
-        }}
-      />
-    </>
+    <iframe
+      src={src}
+      style={{
+        flexGrow: 1,
+        width: '100%',
+        border: '1px solid #ccc',
+        boxSizing: 'border-box',
+      }}
+      title="Service Frame"
+    />
   )
 }
 
