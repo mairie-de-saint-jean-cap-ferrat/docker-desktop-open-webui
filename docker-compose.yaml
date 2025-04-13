@@ -458,14 +458,14 @@ services:
   sequentialthinking-mcp-tool:
     image: mcp/sequentialthinking
     ports:
-      - 11567:8000
+      - 11568:8000
   sqlite-mcp-tool:
     image: mcp/sqlite
     command:
       - --db-path
       - /mcp/open-webui.db
     ports:
-      - 11568:8000
+      - 11569:8000
     volumes:
       - sqlite:/mcp
     
@@ -474,7 +474,7 @@ services:
     command:
       - redis://host.docker.internal:11558
     ports:
-      - 11569:6379
+      - 11570:6379
     volumes:
       - mcp-redis:/data
 

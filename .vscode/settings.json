@@ -7,7 +7,7 @@
     "eslint.run": "onSave",
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     "files.exclude": {
-        "**/.git": false,
+        "**/.git": true,
         "**/.svn": true,
         "**/.hg": true,
         "**/CVS": true,
