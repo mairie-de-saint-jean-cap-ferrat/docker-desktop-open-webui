@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"net"
 	"net/http"
 	"os"
+	"runtime"
 
+	"github.com/Microsoft/go-winio"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
@@ -20,9 +23,6 @@ type AppConfig struct {
 	BRAVE_SEARCH_API_KEY    string `json:"BRAVE_SEARCH_API_KEY"`
 	GOOGLE_SEARCH_API_KEY   string `json:"GOOGLE_SEARCH_API_KEY"`
 	GOOGLE_SEARCH_ENGINE_ID string `json:"GOOGLE_SEARCH_ENGINE_ID"`
-	SERPER_API_KEY          string `json:"SERPER_API_KEY"`
-	SERPAPI_API_KEY         string `json:"SERPAPI_API_KEY"`
-	SEARCHAPI_API_KEY       string `json:"SEARCHAPI_API_KEY"`
 }
 
 const configFilePath = "/data/config.json"
@@ -93,12 +93,40 @@ func rootHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "Backend service is running via Unix socket.")
 }
 
+// Listen function for unix socket
+func listen(path string) (net.Listener, error) {
+	if runtime.GOOS == "windows" {
+		// Configuration des named pipes Windows
+		pipeConfig := &winio.PipeConfig{
+			SecurityDescriptor: "", // Utiliser un descripteur vide permet l'accès à tous les utilisateurs
+			MessageMode:        true,
+			InputBufferSize:    65536,
+			OutputBufferSize:   65536,
+		}
+		// Le chemin sur Windows doit commencer par "\\.\pipe\"
+		// Si le chemin n'est pas correctement formaté, on l'adapte
+		if path[0] != '\\' {
+			path = `\\.\pipe\` + path
+		}
+		return winio.ListenPipe(path, pipeConfig)
+	}
+	// Par défaut, utiliser les sockets UNIX pour Linux/macOS
+	return net.Listen("unix", path)
+}
+
 func main() {
+	// Utilisation de flag comme dans le template
+	var socketPath string
+	flag.StringVar(&socketPath, "socket", "/run/guest-services/backend.sock", "Unix domain socket to listen on")
+	flag.Parse()
+
+	// Suppression du socket existant
+	_ = os.RemoveAll(socketPath)
+
+	// Configuration du logger
 	log.SetOutput(os.Stdout)
 	log.SetLevel(logrus.InfoLevel)
 
-	// Define the standard socket path provided by Docker Desktop based on metadata.json
-	socketPath := "/run/guest-services/backend.sock" // Matches "socket": "backend.sock" in metadata.json
 
 	// Remove the socket file if it already exists to avoid bind errors on restart
 	if _, err := os.Stat(socketPath); err == nil {

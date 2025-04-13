@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/usr/src/app/.npm \
 COPY ui /ui
 RUN npm run build
 
-FROM alpine:3.21.3
+FROM alpine
 # Mettre à jour les labels si nécessaire, supprimer les références obsolètes
 LABEL org.opencontainers.image.title="y0n1x's AI Lab - Open-WebUI" \
     org.opencontainers.image.description="y0n1x's AI Lab for Docker Desktop" \

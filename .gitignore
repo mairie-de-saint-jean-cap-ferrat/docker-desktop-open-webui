@@ -1,3 +1,5 @@
 node_modules
 ui/build
 linux
+docker-extension-template
+vendor
