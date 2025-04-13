@@ -17,7 +17,6 @@
 		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
 		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {},
 		"ghcr.io/lentzi90/features/tilt:0": {},
-		"ghcr.io/devcontainers-community/templates/dart:1": {},
 		"ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {},
 		"ghcr.io/audacioustux/devcontainers/common-utils-extras:1": {},
 		"ghcr.io/goldsam/dev-container-features/cue-lang:1": {},
