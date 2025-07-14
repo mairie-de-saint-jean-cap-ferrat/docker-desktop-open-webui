@@ -6,7 +6,7 @@ updates:
     interval: "daily"
   open-pull-requests-limit: 12
 
-- package-ecosystem: "npm"
+- package-ecosystem: "pnpm"
   directory: "/ui"
   schedule:
     interval: "daily"
